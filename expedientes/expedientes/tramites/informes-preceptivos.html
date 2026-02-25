@@ -1,0 +1,252 @@
+<section id="resolucion" class="card-container" sinacsec:permisos="'P_LECTURA'" th:if="${modeloTramite.expediente != null && modeloTramite.expediente.procedimientoDto != null && modeloTramite.expediente.procedimientoDto.codCorto == 'R'}">
+	<header>
+		<img th:src="@{/static/images/file_checked.svg}" alt="Suspensión por Informes">
+	Suspensión por Informes
+	</header>
+<div id="actualizarComunicaciones" sinacsec:permisos="'P_LECTURA'">
+	<div id="tablaDocumentos" style="display: block;">
+		<table id="tablaDocumentosInformes" aria-describedby="Documentos suspensión informes" class="my-2">
+			<thead>
+				<tr>
+					<th scope="col">
+						<span>Documento</span>
+					</th>
+					<th scope="col">
+						<span>Estado</span>
+					</th>
+					<th scope="col">
+						<span>Fecha creación</span>
+					</th>
+					<th scope="col">
+						<span>Fecha envío a firma</span>
+					</th>
+					<th scope="col">
+						<span>Fecha firma</span>
+					</th>
+					<th scope="col"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="documento, iterStat :${modeloTramite.tablaDocumentos}">
+					<input hidden th:id="|idPlantilla${iterStat.index}|" th:name="|idPlantilla${iterStat.index}|"
+						th:value="${documento.idPla}">
+					<input hidden th:id="|idExpDoc${iterStat.index}|" th:name="|idExpDoc${iterStat.index}|"
+						th:value="${documento.idExpDoc}">
+					<td><span th:text="${documento.nomDocumento}" id="nombreDocumento" name="nombreDocumento"></span>
+					</td>
+					<td>
+						<div th:unless="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}"
+							class="tag-container"
+							th:id="${documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FIR' ? 'checked' : 'info'}">
+							<img th:src="@{/static/images/document_denied-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FRE'}">
+							<img th:src="@{/static/images/document_forward-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-ENF'}">
+							<img th:src="@{/static/images/document_checked-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-FIR'}">
+							<img th:src="@{/static/images/preliminary.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-PVA'}">
+							<img th:src="@{/static/images/check_circle-black.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-VAL'}">
+							<img th:src="@{/static/images/warning-black.svg}" alt="Alerta"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}">
+							<span th:if="${documento.estadoDocumento}"
+								th:text="${documento.estadoDocumento!= null ? documento.estadoDocumento.nomLdvMae : '-'}"
+								th:value="${documento.estadoDocumento.codLdvMae}" id="estadoDocumento"
+								name="estadoDocumento">
+							</span>
+							<span th:unless="${documento.estadoDocumento}" value="pendienteGenerar" id="estadoDocumento"
+								name="estadoDocumento">Pendiente de generar</span>
+						</div>
+						<div th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}"
+							class="tag-container" th:id="alert">
+							<img th:src="@{/static/images/warning-black.svg}" alt="Alerta">
+							<span th:if="${documento.estadoDocumento}"
+								th:text="${documento.estadoDocumento!= null ? documento.estadoDocumento.nomLdvMae}"
+								th:value="${documento.estadoDocumento.codLdvMae}" id="estadoDocumento"
+								name="estadoDocumento">
+						</div>
+					</td>
+					<td>
+						<span th:if="${documento.fechaCreacionDocumento}"
+							th:text="${documento.fechaCreacionDocumento}"></span>
+					</td>
+					<td>
+						<span th:if="${documento.fechaEnvioFirmaDocumento}"
+							th:text="${documento.fechaEnvioFirmaDocumento}"></span>
+					</td>
+					<td>
+						<span th:if="${documento.fechaFirmaDocumento}"
+							th:text="${documento.fechaFirmaDocumento}"></span>
+					</td>
+					<td>
+						<div class="d-flex" sinacsec:permisos="'P_TRAMITA'">
+							<div class="d-flex">
+								<button
+									th:if="${(documento.estadoDocumento == null or documento.estadoDocumento.codLdvMae == 'EDOC-FRE') and modeloTramite.accionesOperaciones?.get('GEND')?.get('SIF') != null}"
+									type="button" class="tertiary ms-auto" th:data-parameter1="${idExp}"
+									th:data-parameter2="${documento.idPla}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('GEND')?.get('SIF')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('GEND')?.get('SIF')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idPlantilla${iterStat.index}'])|">
+									<img th:src="@{/static/images/add_notes.svg}" alt="Generación de plantilla">
+								</button>
+
+								<button
+									th:if="${(documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-BOR') and modeloTramite.accionesOperaciones?.get('FSEL')?.get('SIF') != null}"
+									type="button" class="tertiary" th:data-parameter1="${documento.idExpDoc}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('FSEL')?.get('SIF')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('FSEL')?.get('SIF')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpDoc${iterStat.index}'])|">
+									<img th:src="@{/static/images/document_forward-16-blue.svg}"
+										alt="Firmar sello organo">
+								</button>
+								<button type="button" class="tertiary" th:data-parameter1="${documento.idExpDoc}"
+									th:if="${(documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FIR') and modeloTramite.accionesOperaciones.get('COMD')?.get('SIF') != null }"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('COMD')?.get('SIF')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('COMD')?.get('SIF')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpDoc${iterStat.index}'])|"><img
+										th:src="@{/static/images/forward_to_inbox-18-blue.svg}"
+										alt="Comunicar documento al ciudadano"></button>
+
+							</div>
+
+							<button
+								th:if="${documento.expedienteDocumentoDto != null and documento?.estadoDocumento?.codLdvMae != 'EDOC-NRE' and documento.estadoDocumento != 'pendienteGenerar'}"
+								type="button" onclick="menuDesplegable(this)" id="menuButton" class="tertiary ms-auto"
+								th:disabled="${documento.estadoDocumento == null}"><img
+									th:src="@{/static/images/more_vert.svg}" alt="Más opciones"></button>
+							<span id="expedienteDocumento" hidden th:value="${documento.estadoDocumento}"></span>
+						</div>
+						<div id="menu" class="menu">
+							<div th:if="${documento.expedienteDocumentoDto != null }">
+								<button type="button" class="tertiary" id="abrirDetalleDoc"
+									th:attr="onclick=|abrirModal('${documento.idExpDoc}')|"><img
+										th:src="@{/static/images/find_in_page.svg}" alt="Modal del detalle">
+									Ver detalle</button>
+								<dialog th:id="'modal' + ${documento.idExpDoc}">
+									<th:block
+										th:insert="~{fragments/detalleDocumento :: detalleDocumento('formAcuerdoConsejoMinistros', (${documento.expedienteDocumentoDto}))}">
+									</th:block>
+								</dialog>
+							</div>
+							<button type="button" th:data-parameter1="${modeloTramite.idExp}"
+								th:data-parameter2="${documento.idExpDoc}"
+								th:onclick="descargarDocumentoOriginal(this.getAttribute('data-parameter1'), this.getAttribute('data-parameter2'))"
+								class="tertiary"><img th:src="@{/static/images/download.svg}"
+									alt="Descarga de documento">Descargar</button>
+							<button type="button" th:if="${documento.expedienteDocumentoDto?.codGd != null}"
+								th:data-parameter1="${modeloTramite.idExp}" th:data-parameter2="${documento.idExpDoc}"
+								th:onclick="descargarDocumentoCopiaAutentica(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'));"
+								class="tertiary"><img th:src="@{/static/images/file_save.svg}"
+									alt="Descarga de copia auténtica">Descargar copia auténtica</button>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	</section>
+	<section id="informes" class="card-container">
+		<header>
+			<div class="card-container--left-icon">
+				<img th:src="@{/static/images/description.svg}" alt="Informe">
+			</div>
+			<span>Informes</span>
+			<div class="d-flex gap-3 ms-auto">
+				<button id="cambioVistaDetalle" class="tertiary"
+					onclick="toggleContent({idContenidoAMostrar: 'vistaDetalle', idContenidoAOcultar: 'vistaTabla', idBotonAMostrar: 'cambioVistaTabla', idBotonAOcultar: 'cambioVistaDetalle'})">
+					<img th:src="@{/static/images/table.svg}" alt="Tabla">Cambiar
+					vista a detalle
+				</button>
+				<button id="cambioVistaTabla" class="tertiary"
+					onclick="toggleContent({idContenidoAMostrar: 'vistaTabla', idContenidoAOcultar: 'vistaDetalle', idBotonAMostrar: 'cambioVistaDetalle', idBotonAOcultar: 'cambioVistaTabla'})">
+					<img th:src="@{/static/images/view_array.svg}" alt="Detalle">Cambiar
+					vista a tabla
+				</button>
+				<button class="primary"
+					th:if="${@componentesComunesService.informeDisponibleEstado(modeloTramite.expediente.expedientesEstadosDtos) and @componentesComunesService.informeDisponible(modeloTramite.listaExpedienteInformeDto)}"
+					th:attr="onclick=|solicitarTodosLosInformes('${modeloTramite.idExp}');|">
+					Solicitar todos los informes</button>
+				<button class="primary" th:if="${modeloTramite.accionesOperaciones?.get('OINF')?.get('RINF') != null}"
+					sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('OINF')?.get('RINF')}"
+					th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('OINF')?.get('RINF')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', [])|">
+					Omitir informes</button>
+				<button th:if="${modeloTramite.accionesOperaciones?.get('IVAL')?.get('RINF') != null}"
+					sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('IVAL')?.get('RINF')}"
+					type="button" id="validarTodosInformes" class="primary  ms-auto"
+					th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('IVAL')?.get('RINF')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', [])|">
+					Validar todos los informes</button>
+			</div>
+		</header>
+		<div id="vistaTabla">
+			<table aria-describedby="Tabla de informes" id="tablaInformes" name="tablaInformes">
+				<tr>
+					<th>Informe</th>
+					<th>Estado</th>
+					<th><img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+							title="Fecha en la que el sistema SINAC ha enviado la solicitud del informe al órgano correspondiente. Esta fecha servirá para el cálculo del plazo de respuesta del informe."
+							class="me-1"> Fecha de solicitud</th>
+					<th><img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+							title="Fecha en la que el sistema SINAC recibe la respuesta del informe." class="me-1">
+						Fecha de recepción</th>
+					<th><img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+							title="Fecha de vigencia del informe." class="me-1"> Fecha de caducidad</th>
+				</tr>
+				<tbody>
+					<tr th:each="informe : ${modeloTramite.listaExpedienteInformeDto}">
+						<td th:text="${informe.ldvMaestraDtoByIdInfLdv.desLdvMae}"></td>
+						<td>
+							<div class="tag-container"
+								th:id="${informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-VAL' ? 'checked' : informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-RCH' ||  informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-CAD' ? 'alert' : 'info'}">
+								<img th:src="@{/static/images/check_circle-dark_gray.svg}" alt="Estado del informe"
+									th:if="${informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-VAL'}">
+								<img th:src="@{/static/images/preliminary.svg}" alt="Estado del informe"
+									th:unless="${informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-VAL'}">
+								<span th:text="${informe.ldvMaestraDtoByIdEstInfLdv?.nomLdvMae}"></span>
+							</div>
+						</td>
+						<td><span th:text="${#dates.format(informe.fechaSolicitud, 'dd/MM/yyyy')}"></span>
+						</td>
+						<td><span th:text="${#dates.format(informe.fechaRecepcion, 'dd/MM/yyyy')}"></span>
+						</td>
+						<td><span th:text="${#dates.format(informe.fechaCaducidad, 'dd/MM/yyyy')}"></span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div id="vistaDetalle" class="detail-view-container">
+			<nav class="nav-tab informes">
+				<a class="tab active" href="#formDGP">Dirección General de la
+					Policía</a> <a class="tab" th:if="${modeloTramite.informeMJU!=null}" href="#formMJU">Registro
+					Central de Penados</a> <a class="tab" th:if="${modeloTramite.informeCNI!=null}"
+					href="#formCNI">Centro
+					Nacional de Inteligencia</a> <a th:if="${modeloTramite.informeMDE != null}" class="tab"
+					href="#formMDE">Ministerio de Defensa</a>
+			</nav>
+			<th:block th:insert="~{expedientes/tramites/informes/informes-dgp :: informesDgp()}">
+			</th:block>
+			<!-- <dialog id="modalComunicacionesDGP"> <th:block
+				th:insert="~{fragments/comunicacionesExternas :: comunicacionesExternas(${modeloTramite.comunicacionesExternasDGPSolicitudMotivoRecepcion}, 
+											${modeloTramite.comunicacionesExternasDGPSolicitudTipo}, ${modeloTramite.comunicacionesExternasDGPSolicitudOrgano}, 'Dirección General de la Policía','IDGP')}">
+			</th:block> </dialog> -->
+
+			<th:block th:insert="~{expedientes/tramites/informes/informes-mju :: informesMju()}">
+			</th:block>
+			<!--<dialog id="modalComunicacionesMJU"> <th:block
+				th:insert="~{fragments/comunicacionesExternas :: comunicacionesExternas(${modeloTramite.comunicacionesExternasMJUSolicitudMotivoRecepcion}, 
+													${modeloTramite.comunicacionesExternasMJUSolicitudTipo}, ${modeloTramite.comunicacionesExternasMJUSolicitudOrgano}, 'Registro Central de Penados','IMJU')}">
+			</th:block> </dialog> -->
+			<th:block th:insert="~{expedientes/tramites/informes/informes-cni :: informesCni()}">
+			</th:block>
+			<!--<dialog id="modalComunicacionesCNI"> <th:block
+				th:insert="~{fragments/comunicacionesExternas :: comunicacionesExternas(${modeloTramite.comunicacionesExternasCNISolicitudMotivoRecepcion}, 
+								${modeloTramite.comunicacionesExternasCNISolicitudTipo}, ${modeloTramite.comunicacionesExternasCNISolicitudOrgano}, 'Centro Nacional de Inteligencia','ICNI')}">
+			</th:block> </dialog> -->
+			<th:block th:insert="~{expedientes/tramites/informes/informes-mde :: informesMde()}">
+			</th:block>
+			<dialog id="modalComunicacionesExternas">
+				<th:block th:insert="~{fragments/comunicacionesExternas :: comunicacionesExternas()}">
+				</th:block>
+			</dialog>
+		</div>
+	</section>
+</div>

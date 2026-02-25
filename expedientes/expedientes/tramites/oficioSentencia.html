@@ -1,0 +1,491 @@
+<section class="card-container" sinacsec:permisos="'P_LECTURA'">
+	<header>Oficio Sentencia</header>
+	<form th:action="@{/expedientes/{idExp}/tramite/OSE/(idExp=${modeloTramite.idExp})}" th:object="${modeloTramite}"
+		id="formOficioSentencia" method="post">
+		<input type="hidden" th:value="${modeloTramite.idExp}" id="idExp"></input>
+		<input type="hidden" id="urlEditarDocumento" th:value="${urlEditarDocumento}" name="urlEditarDocumento"></input>
+		<input hidden th:value=${modeloTramite.accionesOperaciones}>
+		<div class="d-flex mt-2 mb-4" sinacsec:permisos="'P_TRAMITA'">
+			<button type="button" class="tertiary ms-auto" id="descargarDocumentos"
+				th:onclick="descargarDocumentosMultipleConsejoMinistros()">Descargar
+				<img th:src="@{/static/images/download.svg}" alt="Descarga">
+			</button>
+		</div>
+		<span id="errorValidator" class="error-validator" name="errorAcuerdoIncoacion" hidden></span>
+		<table id="tablaDocumentosAcuerdoIncoacion" aria-describedby="Documentos Oficio Sentencia" class="my-2">
+			<thead>
+				<tr>
+					<th scope="col"><span><input type="checkbox" id="checkboxMarcarTodos" name="checkboxMarcarTodos"
+								th:onchange="marcarDesmarcarCheckboxes()"></span></th>
+					<th scope="col">
+						<span>Documento</span>
+					</th>
+					<th scope="col">
+						<span>Estado</span>
+					</th>
+					<th scope="col">
+						<span>F. creación</span>
+					</th>
+					<th scope="col">
+						<span>F. envío a firma</span>
+					</th>
+					<th scope="col">
+						<span>F. firma</span>
+					</th>
+					<th scope="col"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="documento, iterStat :${modeloTramite.tablaDocumentos}">
+					<input hidden th:id="|idPlantilla${iterStat.index}|" th:name="|idPlantilla${iterStat.index}|"
+						th:value="${documento.idPla}">
+					<input hidden th:id="|idExpDoc${iterStat.index}|" th:name="|idExpDoc${iterStat.index}|"
+						th:value="${documento.idExpDoc}">
+					<td>
+						<input th:if="${documento.nomDocumento}" th:value="${documento.idExpDoc}" type="checkbox"
+							id="checkboxDocumentoAcuerdo" class="idDocsGenerados" name="agregarDocumento"
+							th:data-parameter1="${documento.nomDocumento}"
+							th:data-parameter2="${documento.codTFirmaLdv}"
+							th:data-parameter3="${documento.estadoDocumento != null ? documento.estadoDocumento.codLdvMae : null}"
+							th:data-parameter4="|idPlantilla${iterStat.index}|"
+							th:data-parameter5=|idExpDoc${iterStat.index}| th:data-parameter6="${documento.codDocTipo}"
+							th:disabled="${documento.estadoDocumento != null ? 'disabled' : null}"
+							th:checked="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae != 'EDOC-NRE'}">
+					</td>
+					<td><span th:text="${documento.nomDocumento}" id="nombreDocumento" name="nombreDocumento"></span>
+					</td>
+					<td>
+						<div th:unless="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}"
+							class="tag-container"
+							th:id="${documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FIR' ? 'checked' : 'info'}">
+							<img th:src="@{/static/images/document_denied-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FRE'}">
+							<img th:src="@{/static/images/document_forward-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-ENF'}">
+							<img th:src="@{/static/images/document_checked-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-FIR'}">
+							<img th:src="@{/static/images/warning-black.svg}" alt="Alerta"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}">
+							<span th:if="${documento.estadoDocumento}"
+								th:text="${documento.estadoDocumento!= null ? documento.estadoDocumento.nomLdvMae : '-'}"
+								th:value="${documento.estadoDocumento.codLdvMae}" id="estadoDocumento"
+								name="estadoDocumento">
+							</span>
+							<span th:unless="${documento.estadoDocumento}" value="pendienteGenerar" id="estadoDocumento"
+								name="estadoDocumento">Pendiente de generar</span>
+						</div>
+						<div th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}"
+							class="tag-container" th:id="alert">
+							<img th:src="@{/static/images/warning-black.svg}" alt="Alerta">
+							<span th:if="${documento.estadoDocumento}"
+								th:text="${documento.estadoDocumento!= null ? documento.estadoDocumento.nomLdvMae : '-'}"
+								th:value="${documento.estadoDocumento.codLdvMae}" id="estadoDocumento"
+								name="estadoDocumento">
+						</div>
+					</td>
+					<td>
+						<span th:if="${documento.fechaCreacionDocumento}"
+							th:text="${documento.fechaCreacionDocumento}"></span>
+						<span th:unless="${documento.fechaCreacionDocumento}">-</span>
+					</td>
+					<td>
+						<span th:if="${documento.fechaEnvioFirmaDocumento}"
+							th:text="${documento.fechaEnvioFirmaDocumento}"></span>
+						<span th:unless="${documento.fechaEnvioFirmaDocumento}" th:text="'-'"></span>
+					</td>
+					<td>
+						<span th:if="${documento.fechaFirmaDocumento}"
+							th:text="${documento.fechaFirmaDocumento}"></span>
+						<span th:unless="${documento.fechaFirmaDocumento}" th:text="'-'"></span>
+					</td>
+					<td>
+						<div class="d-flex" sinacsec:permisos="'P_TRAMITA'">
+							<div class="d-flex">
+								<button
+									th:if="${(documento.estadoDocumento == null or documento.estadoDocumento.codLdvMae == 'EDOC-FRE') and modeloTramite.accionesOperaciones?.get('GEND')?.get('GOSF') != null }"
+									type="button" class="tertiary ms-auto" th:data-parameter1="${idExp}"
+									th:data-parameter2="${documento.idPla}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('GEND')?.get('GOSF')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('GEND')?.get('GOSF')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idPlantilla${iterStat.index}'])|">
+									<img th:src="@{/static/images/add_notes.svg}" alt="Generación de plantilla">
+								</button>
+								<button
+									th:if="${documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-BOR'}"
+									type="button" th:data-parameter1="${modeloTramite.idExp}"
+									th:data-parameter2="${documento.idExpDoc}"
+									th:data-parameter3="${modeloTramite.codTramite}" class="tertiary"
+									th:onclick="getDocumentoUrl(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))">
+									<img th:src="@{/static/images/edit.svg}" alt="Edición de plantilla"></button>
+								<button
+									th:if="${(documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-BOR') and modeloTramite.accionesOperaciones?.get('EPFI')?.get('EOSF') != null and documento.codTFirmaLdv != 'TFIR-NFI'}"
+									type="button" class="tertiary" th:data-parameter1="${documento.idExpDoc}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('EPFI')?.get('EOSF')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('EPFI')?.get('EOSF')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpDoc${iterStat.index}'])|">
+									<img th:src="@{/static/images/document_forward-16-blue.svg}" alt="Envío a firma">
+								</button>
+								<button
+									th:if="${(documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FIR') and modeloTramite.accionesOperaciones?.get('CORC')?.get('ESRC') != null and documento.codTFirmaLdv != 'TFIR-NFI'}"
+									type="button" class="tertiary" th:data-parameter1="${documento.idExpDoc}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('CORC')?.get('ESRC')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('CORC')?.get('ESRC')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpDoc${iterStat.index}'])|">
+									<img th:src="@{/static/images/document_forward-16-blue.svg}" alt="Envío a RC">
+								</button>
+								<button
+									th:if="${(documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FIR') and modeloTramite.accionesOperaciones?.get('CDGP')?.get('ESDGP') != null and documento.codTFirmaLdv != 'TFIR-NFI'}"
+									type="button" class="tertiary" th:data-parameter1="${documento.idExpDoc}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('CDGP')?.get('ESDGP')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('CDGP')?.get('ESDGP')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpDoc${iterStat.index}'])|">
+									<img th:src="@{/static/images/document_forward-16-blue.svg}" alt="Envío a DGP">
+								</button>
+							</div>
+
+							<button
+								th:if="${documento.expedienteDocumentoDto != null and documento?.estadoDocumento?.codLdvMae != 'EDOC-NRE' and documento.estadoDocumento != 'pendienteGenerar'}"
+								type="button" onclick="menuDesplegable(this)" id="menuButton" class="tertiary ms-auto"
+								th:disabled="${documento.estadoDocumento == null}"><img
+									th:src="@{/static/images/more_vert.svg}" alt="Más opciones"></button>
+							<span id="expedienteDocumento" hidden th:value="${documento.estadoDocumento}"></span>
+						</div>
+						<div id="menu" class="menu">
+							<div th:if="${documento.expedienteDocumentoDto != null }">
+								<button type="button" class="tertiary" id="abrirDetalleDoc"
+									th:attr="onclick=|abrirModal('${documento.idExpDoc}')|"><img
+										th:src="@{/static/images/find_in_page.svg}" alt="Modal del detalle">
+									Ver detalle</button>
+								<dialog th:id="'modal' + ${documento.idExpDoc}">
+									<th:block
+										th:insert="~{fragments/detalleDocumento :: detalleDocumento('formAcuerdoConsejoMinistros', (${documento.expedienteDocumentoDto}))}">
+									</th:block>
+								</dialog>
+							</div>
+							<button type="button" th:data-parameter1="${modeloTramite.idExp}"
+								th:data-parameter2="${documento.idExpDoc}"
+								th:onclick="descargarDocumentoOriginal(this.getAttribute('data-parameter1'), this.getAttribute('data-parameter2'))"
+								class="tertiary"><img th:src="@{/static/images/download.svg}"
+									alt="Descarga de documento">Descargar</button>
+							<button type="button"
+								th:if="${documento.estadoDocumento != null and (documento.estadoDocumento.codLdvMae == 'EDOC-FIR' or documento.estadoDocumento.codLdvMae == 'EDOC-FRE')}"
+								th:data-parameter1="${modeloTramite.idExp}" th:data-parameter2="${documento.idExpDoc}"
+								th:onclick="descargarDocumentoCopiaAutentica(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'));"
+								class="tertiary"><img th:src="@{/static/images/file_save.svg}"
+									alt="Descarga de copia auténtica">Descargar copia auténtica</button>
+						</div>
+					</td>
+					<td th:if="${documento?.estadoDocumento?.codLdvMae == 'EDOC-NRE'}">
+						<div class="d-flex">
+							<button title="Más opciones" type="button" onclick="menuDesplegable(this)" id="menuButton"
+								class="tertiary  ms-auto">
+								<img th:src="@{/static/images/more_vert.svg}" alt="Más opciones">
+							</button>
+						</div>
+						<div id="menu" class="menu" style="display: none;">
+							<button type="button" id="abrirAdjuntar" class="tertiary" sinacsec:permisos="'P_GRABA'"
+								th:attr="onclick=|abrirModalAdjuntar('${documento?.idExpDoc}', '${documento?.nomDocumento}');limpiarCamposModalAdjuntar();|">
+								<img th:src="@{/static/images/attach_file.svg}" alt="Adjunto de documento">Adjuntar
+							</button>
+
+						</div>
+					</td>
+				</tr>
+				<tr th:each="documento, iterStat :${modeloTramite.tablaDocumentosAutoAn}">
+					<input hidden th:id="|idPlantilla1${iterStat.index}|" th:name="|idPlantilla1${iterStat.index}|"
+						th:value="${documento.idPla}">
+					<input hidden th:id="|idExpDoc1${iterStat.index}|" th:name="|idExpDoc1${iterStat.index}|"
+						th:value="${documento.idExpDoc}">
+					<td>
+						<input th:if="${documento.nomDocumento}" th:value="${documento.idExpDoc}" type="checkbox"
+							id="checkboxDocumentoAcuerdo" class="idDocsGenerados" name="agregarDocumento"
+							th:data-parameter1="${documento.nomDocumento}"
+							th:data-parameter2="${documento.codTFirmaLdv}"
+							th:data-parameter3="${documento.estadoDocumento != null ? documento.estadoDocumento.codLdvMae : null}"
+							th:data-parameter4="|idPlantilla1${iterStat.index}|"
+							th:data-parameter5=|idExpDoc1${iterStat.index}| th:data-parameter6="${documento.codDocTipo}"
+							th:disabled="${documento.estadoDocumento != null ? 'disabled' : null}"
+							th:checked="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae != 'EDOC-NRE'}">
+					</td>
+					<td><span th:text="${documento.nomDocumento}" id="nombreDocumento" name="nombreDocumento"></span>
+					</td>
+					<td>
+						<div th:unless="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}"
+							class="tag-container"
+							th:id="${documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FIR' ? 'checked' : 'info'}">
+							<img th:src="@{/static/images/document_denied-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FRE'}">
+							<img th:src="@{/static/images/document_forward-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-ENF'}">
+							<img th:src="@{/static/images/document_checked-16-grey.svg}" alt="Estado del documento"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-FIR'}">
+							<img th:src="@{/static/images/warning-black.svg}" alt="Alerta"
+								th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}">
+							<span th:if="${documento.estadoDocumento}"
+								th:text="${documento.estadoDocumento!= null ? documento.estadoDocumento.nomLdvMae : '-'}"
+								th:value="${documento.estadoDocumento.codLdvMae}" id="estadoDocumento"
+								name="estadoDocumento">
+							</span>
+							<span th:unless="${documento.estadoDocumento}" value="pendienteGenerar" id="estadoDocumento"
+								name="estadoDocumento">Pendiente de generar</span>
+						</div>
+						<div th:if="${documento.estadoDocumento != null and documento.estadoDocumento?.codLdvMae == 'EDOC-NRE'}"
+							class="tag-container" th:id="alert">
+							<img th:src="@{/static/images/warning-black.svg}" alt="Alerta">
+							<span th:if="${documento.estadoDocumento}"
+								th:text="${documento.estadoDocumento!= null ? documento.estadoDocumento.nomLdvMae : '-'}"
+								th:value="${documento.estadoDocumento.codLdvMae}" id="estadoDocumento"
+								name="estadoDocumento">
+						</div>
+					</td>
+					<td>
+						<span th:if="${documento.fechaCreacionDocumento}"
+							th:text="${documento.fechaCreacionDocumento}"></span>
+						<span th:unless="${documento.fechaCreacionDocumento}">-</span>
+					</td>
+					<td>
+						<span th:if="${documento.fechaEnvioFirmaDocumento}"
+							th:text="${documento.fechaEnvioFirmaDocumento}"></span>
+						<span th:unless="${documento.fechaEnvioFirmaDocumento}" th:text="'-'"></span>
+					</td>
+					<td>
+						<span th:if="${documento.fechaFirmaDocumento}"
+							th:text="${documento.fechaFirmaDocumento}"></span>
+						<span th:unless="${documento.fechaFirmaDocumento}" th:text="'-'"></span>
+					</td>
+					<td>
+						<div class="d-flex" sinacsec:permisos="'P_TRAMITA'">
+							<div class="d-flex">
+								<button
+									th:if="${(documento.estadoDocumento == null or documento.estadoDocumento.codLdvMae == 'EDOC-FRE') and modeloTramite.accionesOperaciones?.get('GEND')?.get('GAAN') != null }"
+									type="button" class="tertiary ms-auto" th:data-parameter1="${idExp}"
+									th:data-parameter2="${documento.idPla}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('GEND')?.get('GAAN')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('GEND')?.get('GAAN')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idPlantilla1${iterStat.index}'])|">
+									<img th:src="@{/static/images/add_notes.svg}" alt="Generación de plantilla">
+								</button>
+								<button
+									th:if="${documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-BOR'}"
+									type="button" th:data-parameter1="${modeloTramite.idExp}"
+									th:data-parameter2="${documento.idExpDoc}"
+									th:data-parameter3="${modeloTramite.codTramite}" class="tertiary"
+									th:onclick="getDocumentoUrl(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'),this.getAttribute('data-parameter3'))">
+									<img th:src="@{/static/images/edit.svg}" alt="Edición de plantilla"></button>
+								<button
+									th:if="${(documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-BOR') and modeloTramite.accionesOperaciones?.get('EPFI')?.get('EAAN') != null and documento.codTFirmaLdv != 'TFIR-NFI'}"
+									type="button" class="tertiary" th:data-parameter1="${documento.idExpDoc}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('EPFI')?.get('EAAN')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('EPFI')?.get('EAAN')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpDoc1${iterStat.index}'])|">
+									<img th:src="@{/static/images/document_forward-16-blue.svg}" alt="Envío a firma">
+								</button>
+								<button
+									th:if="${(documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FIR') and modeloTramite.accionesOperaciones?.get('CORC')?.get('EANRC') != null and documento.codTFirmaLdv != 'TFIR-NFI'}"
+									type="button" class="tertiary" th:data-parameter1="${documento.idExpDoc}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('CORC')?.get('EANRC')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('CORC')?.get('EANRC')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpDoc1${iterStat.index}'])|">
+									<img th:src="@{/static/images/document_forward-16-blue.svg}" alt="Envío a RC">
+								</button>
+								<button
+									th:if="${(documento.estadoDocumento != null and documento.estadoDocumento.codLdvMae == 'EDOC-FIR') and modeloTramite.accionesOperaciones?.get('CDGP')?.get('EADGP') != null and documento.codTFirmaLdv != 'TFIR-NFI'}"
+									type="button" class="tertiary" th:data-parameter1="${documento.idExpDoc}"
+									sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('CDGP')?.get('EADGP')}"
+									th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('CDGP')?.get('EADGP')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpDoc1${iterStat.index}'])|">
+									<img th:src="@{/static/images/document_forward-16-blue.svg}" alt="Envío a DGP">
+								</button>
+							</div>
+
+							<button
+								th:if="${documento.expedienteDocumentoDto != null and documento?.estadoDocumento?.codLdvMae != 'EDOC-NRE' and documento.estadoDocumento != 'pendienteGenerar'}"
+								type="button" onclick="menuDesplegable(this)" id="menuButton" class="tertiary ms-auto"
+								th:disabled="${documento.estadoDocumento == null}"><img
+									th:src="@{/static/images/more_vert.svg}" alt="Más opciones"></button>
+							<span id="expedienteDocumento" hidden th:value="${documento.estadoDocumento}"></span>
+						</div>
+						<div id="menu" class="menu">
+							<div th:if="${documento.expedienteDocumentoDto != null }">
+								<button type="button" class="tertiary" id="abrirDetalleDoc"
+									th:attr="onclick=|abrirModal('${documento.idExpDoc}')|"><img
+										th:src="@{/static/images/find_in_page.svg}" alt="Modal del detalle">
+									Ver detalle</button>
+								<dialog th:id="'modal' + ${documento.idExpDoc}">
+									<th:block
+										th:insert="~{fragments/detalleDocumento :: detalleDocumento('formAcuerdoConsejoMinistros', (${documento.expedienteDocumentoDto}))}">
+									</th:block>
+								</dialog>
+							</div>
+							<button type="button" th:data-parameter1="${modeloTramite.idExp}"
+								th:data-parameter2="${documento.idExpDoc}"
+								th:onclick="descargarDocumentoOriginal(this.getAttribute('data-parameter1'), this.getAttribute('data-parameter2'))"
+								class="tertiary"><img th:src="@{/static/images/download.svg}"
+									alt="Descarga de documento">Descargar</button>
+							<button type="button"
+								th:if="${documento.estadoDocumento != null and (documento.estadoDocumento.codLdvMae == 'EDOC-FIR' or documento.estadoDocumento.codLdvMae == 'EDOC-FRE')}"
+								th:data-parameter1="${modeloTramite.idExp}" th:data-parameter2="${documento.idExpDoc}"
+								th:onclick="descargarDocumentoCopiaAutentica(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'));"
+								class="tertiary"><img th:src="@{/static/images/file_save.svg}"
+									alt="Descarga de copia auténtica">Descargar copia auténtica</button>
+						</div>
+					</td>
+				</tr>
+				<tr th:each="documentoEntrada, iterstat : ${modeloTramite.tablaDocumentosAdi}"
+					th:classappend="${!documentoEntrada.flgActivo and documentoEntrada.ldvMaestraDtoByIdEstDocLdv != null and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae != 'EDOC-NRE'} ? historico : '' ">
+					<td>
+					</td>
+					<td>
+						<span th:text="${documentoEntrada.documentoTipoDto.nomTipo}"></span>
+					</td>
+
+					<td>
+						<div class="d-flex gap-2">
+							<div class="tag-container" id="alert"
+								th:if="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-NRE'}">
+								<img th:src="@{/static/images/warning-black.svg}" alt="Alerta">
+								<span th:text="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.nomLdvMae}"></span>
+							</div>
+							<div class="tag-container"
+								th:if="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv != null and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae != 'EDOC-NRE'}"
+								th:id="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv.nomLdvMae == 'En requerimiento' or documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-PVA' ? 'info' : 
+														(documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-INC' or  documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-EFI' or  documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-ERE' or  documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-EGD') ? 'alert' 
+														: 'checked'}">
+								<img th:src="@{/static/images/cancel-black.svg}" alt="Estado del documento"
+									th:if="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-INC'}">
+								<img th:src="@{/static/images/check_circle-black.svg}" alt="Estado del documento"
+									th:if="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-VAL'}">
+								<img th:src="@{/static/images/preliminary.svg}" alt="Estado del documento"
+									th:if="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-PVA'}">
+								<img th:src="@{/static/images/warning-black.svg}" alt="Estado del documento"
+									th:if="${documentoEntrada.codGd == null and (documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae != 'EDOC-PVA' and documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae != 'EDOC-VAL' and documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae != 'EDOC-INC')}">
+								<span th:unless="${documentoEntrada.codGd == null and (documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-PVA' 
+														and documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-VAL' 
+														and documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae == 'EDOC-INC'
+															and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-EFI' 
+															and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-ERE' 
+															and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-EGD')}"
+									th:text="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.nomLdvMae}"></span>
+								<span
+									th:if="${documentoEntrada.codGd == null and (documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae != 'EDOC-PVA' and documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae != 'EDOC-VAL' and documentoEntrada.ldvMaestraDtoByIdEstDocLdv.codLdvMae != 'EDOC-INC')}">
+									Subida incompleta</span>
+							</div>
+							<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+								th:if="${documentoEntrada.codGd == null and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae != 'EDOC-NRE'}"
+								title="El documento ha sido guardado pero no se ha completado la subida al gestor documental, para reintentarlo, únicamente pulse el icono de reintentar.">
+						</div>
+					</td>
+					<td>
+						<span
+							th:text="${documentoEntrada.registroDtos != null and !documentoEntrada.registroDtos.empty and documentoEntrada.registroDtos[0].fechaReg != null} ? ${documentoEntrada.registroDtos[0].fechaReg}"></span>
+					</td>
+					<td
+						th:if="${documentoEntrada.codGd == null and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae != 'EDOC-NRE'}">
+						<div class="d-flex">
+							<button type="button" class="tertiary" title="Subir a Gestor Documental"
+								sinacsec:permisos="P_TRAMITA"
+								th:attr="onclick=|ajaxLoadForm('${url}/expedientes/${modeloTramite.idExp}/tramite/REV/documentos/${documentoEntrada.idExpDoc}', 'POST', 'expediente', new Array('documentosEntrada'), false)|">
+								<img th:src="@{/static/images/sync.svg}" alt="Subir a Gestor Documental">
+							</button>
+							<button type="button" class="tertiary"
+								th:if="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-PVA' OR documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-INC'}"
+								title="Validación de documento" sinacsec:permisos="'P_TRAMITA'"
+								th:attr="onclick=|ajaxLoadForm('${url}/expedientes/${modeloTramite.idExp}/tramite/REV/documentos/${documentoEntrada.idExpDoc}/validar-rechazar/1', 'POST', 'expediente', new Array('documentosEntrada'),false)|">
+								<img th:src="@{/static/images/check_circle-blue.svg}" alt="Validación de documento">
+							</button>
+							<button type="button" class="tertiary"
+								th:if="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-PVA' OR documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-VAL'}"
+								title="Invalidación de documento" sinacsec:permisos="'P_TRAMITA'"
+								th:attr="onclick=|ajaxLoadForm('${url}/expedientes/${modeloTramite.idExp}/tramite/REV/documentos/${documentoEntrada.idExpDoc}/validar-rechazar/0', 'POST', 'expediente', new Array('documentosEntrada'),false)|">
+								<img th:src="@{/static/images/cancel-blue.svg}" alt="Invalidación de documento">
+							</button>
+							<button title="Más opciones" type="button" onclick="menuDesplegable(this)" id="menuButton"
+								class="tertiary  ms-auto">
+								<img th:src="@{/static/images/more_vert.svg}" alt="Más opciones">
+							</button>
+						</div>
+						<div id="menu" class="menu">
+							<button type="button" class="tertiary" id="abrirDetalleDoc"
+								th:attr="onclick=|abrirModal('${documentoEntrada.idExpDoc}')|">
+								<img th:src="@{/static/images/find_in_page.svg}" alt="Modal del detalle"> Ver detalle
+							</button>
+							<dialog th:id="'modal' + ${documentoEntrada.idExpDoc}">
+								<th:block
+									th:insert="~{fragments/detalleDocumento :: detalleDocumento('modeloTramite.expediente', (${documentoEntrada}))}">
+								</th:block>
+							</dialog>
+							<button type="button" th:data-parameter1="${modeloTramite.idExp}"
+								th:data-parameter2="${documentoEntrada.idExpDoc}"
+								th:onclick="descargarDocumentoOriginal(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'));"
+								class="tertiary">
+								<img th:src="@{/static/images/download.svg}" alt="Descarga de documento">Descargar
+							</button>
+
+						</div>
+					</td>
+					<td th:if="${!documentoEntrada.flgActivo and documentoEntrada.ldvMaestraDtoByIdEstDocLdv != null 
+													and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae != 'EDOC-NRE' 
+													and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae != 'EDOC-EFI' 
+													and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae != 'EDOC-ERE' 
+													and documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae != 'EDOC-EGD'}">
+						<button title="Más opciones" type="button" onclick="menuDesplegable(this)" id="menuButton"
+							class="tertiary ms-auto">
+							<img th:src="@{/static/images/more_vert.svg}" alt="Más opciones">
+						</button>
+						<div id="menu" class="menu">
+							<button type="button" class="tertiary" id="abrirDetalleDoc"
+								th:attr="onclick=|abrirModal('${documentoEntrada.idExpDoc}')|">
+								<img th:src="@{/static/images/find_in_page.svg}" alt="Modal del detalle"> Ver detalle
+							</button>
+							<button type="button" th:data-parameter1="${modeloTramite.idExp}"
+								th:data-parameter2="${documentoEntrada.idExpDoc}"
+								th:onclick="descargarDocumentoOriginal(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'));"
+								class="tertiary">
+								<img th:src="@{/static/images/download.svg}" alt="Descarga de documento">Descargar
+							</button>
+							<button type="button" th:if="${documentoEntrada.codGd != null}"
+								th:data-parameter1="${modeloTramite.idExp}"
+								th:data-parameter2="${documentoEntrada.idExpDoc}"
+								th:onclick="descargarDocumentoCopiaAutentica(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'));"
+								class="tertiary">
+								<img th:src="@{/static/images/file_save.svg}"
+									alt="Descarga de copia auténtica">Descargar copia
+								auténtica
+							</button>
+
+							<dialog th:id="'modal' + ${documentoEntrada.idExpDoc}">
+								<th:block
+									th:insert="~{fragments/detalleDocumento :: detalleDocumento('modeloTramite.expediente', (${documentoEntrada}))}">
+								</th:block>
+								<button th:id="'cerrarAdjuntar'+${documentoEntrada.idExpDoc}" class="tertiary"
+									th:attr="onclick=|cerrarModal('${documentoEntrada.idExpDoc}')|">Cerrar</button>
+							</dialog>
+						</div>
+					</td>
+					<td></td>
+					<td th:if="${documentoEntrada.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-NRE'}">
+						<div class="d-flex">
+							<button title="Más opciones" type="button" onclick="menuDesplegable(this)" id="menuButton"
+								class="tertiary  ms-auto">
+								<img th:src="@{/static/images/more_vert.svg}" alt="Más opciones">
+							</button>
+						</div>
+						<div id="menu" class="menu" style="display: none;">
+							<button type="button" id="abrirAdjuntar" class="tertiary" sinacsec:permisos="'P_GRABA'"
+								th:attr="onclick=|abrirModalAdjuntar('${documentoEntrada.documentoTipoDto.idDocTipo}', '${documentoEntrada.documentoTipoDto.nomTipo}');limpiarCamposModalAdjuntar();|">
+								<img th:src="@{/static/images/attach_file.svg}" alt="Adjunto de documento">Adjuntar
+							</button>
+
+						</div>
+					</td>
+				</tr>
+
+			</tbody>
+		</table>
+		<!--<button class="secondary mt-4">
+			<svg width="14" height="14" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<path
+					d="M4.33325 5.66671H0.333252V4.33337H4.33325V0.333374H5.66658V4.33337H9.66658V5.66671H5.66658V9.66671H4.33325V5.66671Z"
+					fill="#0F5DA3" />
+			</svg>Añadir otros documentos</button>-->
+	</form>
+	<dialog id="modalAdjuntarDocumento">
+		<th:block
+			th:insert="~{expedientes/adjuntarDocumentos :: adjuntarDocumentos('modeloTramite.expediente', (${modeloTramite.expediente.procedimientoDto.idPro}),'false')}">
+		</th:block>
+	</dialog>
+	<form action="#" id="formularioEditarDocumento" name="formularioEditarDocumento" method="get">
+	</form>
+</section>

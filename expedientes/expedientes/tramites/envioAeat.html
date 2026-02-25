@@ -1,0 +1,31 @@
+<section class="card-container" sinacsec:permisos="'P_LECTURA'">
+		<header>Envio a AEAT</header>
+		<form th:action="@{/expedientes/{idExp}/tramite/EAT/(idExp=${modeloTramite.idExp})}" th:object="${modeloTramite}"
+			id="formEnvioAEAT" name="formEnvioAEAT" method="post">
+			<input type="hidden" th:value="${modeloTramite}" id="modTra"></input>
+			<input type="hidden" th:value="${modeloTramite.codEstadoExpediente}" id="codEstExp"></input>
+			<input type="hidden" th:value="${modeloTramite.idExp}" id="idExp"></input>
+			<input type="hidden" id="urlEditarDocumento" th:value="${urlEditarDocumento}" name="urlEditarDocumento"></input>
+			<input hidden id="accOpe" name="accOpe" th:value="${modeloTramite.accionesOperaciones}" />
+			<input hidden id="coEstExp" name="coEstExp" th:value="${modeloTramite.codEstadoExpediente}" />
+			<div th:if="${modeloTramite.codEstadoExpediente != null && modeloTramite.codEstadoExpediente != 'PCAA'			
+					&& modeloTramite.accionesOperaciones?.get('CAEA')?.get('CAT') == null 
+					&& !(modeloTramite.codEstadoExpediente.matches('CAAR|EXCP|ARCE'))}">
+				<p><span th:text="#{expediente.envioAgenTrib.mensajeDefault}"></span></p>
+			</div>
+			<div class="d-flex mt-2 mb-4" sinacsec:permisos="'P_TRAMITA'" 
+				th:if="${modeloTramite.accionesOperaciones?.get('CAEA')?.get('CAT') != null && modeloTramite.codEstadoExpediente == 'PCAA'}">
+				<div id="divBotonComunicar" style="display: block;">
+					<div id="botonComunicar" class="d-grid gap-2 d-md-flex justify-content-md-start">
+						<button	type="button" title="Comunicar devolución de tasas a la AEAT"
+						th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('CAEA')?.get('CAT')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['formEnvioAEAT'])|"
+							class="primary">Comunicar a AEAT</button>
+					</div>
+				</div>
+			</div>
+			<div th:if="${modeloTramite.codEstadoExpediente != null && modeloTramite.codEstadoExpediente.matches('CAAR|EXCP|ARCE')}">
+				<p><span th:text="#{expediente.envioAgenTrib.mensajeEnviadoAEAT}"></span></p>
+			</div>
+			
+		</form>
+</section>

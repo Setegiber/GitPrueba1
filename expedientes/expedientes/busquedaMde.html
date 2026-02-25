@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<section name="head"
+	th:insert="~{layout/head (title='SINAC - Búsqueda de expedientes MDE')}">
+
+	<head>
+<title>SINAC - Búsqueda de expedientes MDE</title>
+	</head>
+</section>
+
+<body>
+	<th:block th:insert="~{layout/header :: header}"></th:block>
+	<div class="d-grid home-container">
+		<th:block th:insert="~{layout/menu}"></th:block>
+		<main class="main-content">
+			<header>
+				<span class="header-title">Expedientes con Informe <span
+					th:if="${BusquedaExpedientesDto.nombreRol == 'Ejército Tierra'}">del
+						ejército de tierra</span> <span
+					th:if="${BusquedaExpedientesDto.nombreRol == 'Ejército Aire'}">del
+						ejército de aire</span> <span
+					th:if="${BusquedaExpedientesDto.nombreRol == 'Armada'}">de
+						la armada</span> <span
+					th:if="${BusquedaExpedientesDto.nombreRol == 'Servicios Centrales'}">de
+						servicios centrales</span> <span
+					th:if="${BusquedaExpedientesDto.idTarjetaInicio == 16}">pendiente</span>
+					<span th:if="${BusquedaExpedientesDto.idTarjetaInicio == 17}">respondido</span>
+				</span>
+				<button id="mostrarFiltros"
+					onclick="toggleContent({idContenidoAMostrar: 'formBusquedaExpedientes', idContenidoAOcultar: null, idBotonAMostrar: 'ocultarFiltros', idBotonAOcultar: 'mostrarFiltros'})"
+					class="tertiary"
+					th:classappend="${BusquedaExpedientesDto.idTarjetaInicio != null} ? 'oculto'
+					">
+					Mostrar filtros<img th:src="@{/static/images/filter_alt.svg}"
+						alt="Filtros ocultos/mostrados">
+				</button>
+				<button id="ocultarFiltros"
+					onclick="toggleContent({idContenidoAMostrar: null, idContenidoAOcultar: 'formBusquedaExpedientes', idBotonAMostrar: 'mostrarFiltros', idBotonAOcultar: 'ocultarFiltros'})"
+					class="tertiary"
+					th:classappend="${BusquedaExpedientesDto.idTarjetaInicio == null} ? 'oculto'
+										">
+					Ocultar filtros<img th:src="@{/static/images/filter_alt_off.svg}"
+						alt="Filtros ocultos/mostrados">
+				</button>
+			</header>
+			<form id="formBusquedaExpedientes"
+				th:action="@{/expedientes/busquedaMde}" method="get"
+				class="needs-validation" novalidate>
+				<input type="hidden" th:name="idTarjetaInicio" th:value="${BusquedaExpedientesDto.idTarjetaInicio}"/>
+				<section id="busquedaExpedientes" class="card-container">
+					<header>
+						<div class="card-container--left-icon">
+							<img th:src="@{/static/images/search.svg}"
+								alt="Búsqueda de expedientes">
+						</div>
+						<span>Filtros de Expediente</span>
+					</header>
+					<div id="filtro">
+						<div id="filtroExpediente">
+							<div class="filter-content">
+								<div>
+									<strong>Datos de expediente</strong>
+								</div>
+								<div class="info-container">
+									<div>
+										<input class="form-control" type="text" maxlength="50"
+											placeholder="" id="codExp" name="codExp" value=""> <label
+											for="codExp">Código de expediente</label>
+									</div>
+									<div>
+										<select th:id="importante" th:name="importante"
+											class="form-control">
+											<option selected value=""></option>
+											<option value="No">No</option>
+											<option value="Sí">Sí</option>
+										</select> <label th:for="importante">Importante</label>
+									</div>
+									<div>
+										<select class="form-control" th:name="respuestaInforme">
+											<option selected value=""></option>
+											<option
+												th:each="comboDto : ${@componentesComunesService.getComboDtoByCodLdvEntidadMaestra('SINF_MDE')}"
+												th:text="${comboDto.valorCampoDesplegable}"
+												th:value="${comboDto.idCampoDesplegable}">
+										</select> <label for="respuestaInforme">Respuesta informe</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="filtroInteresado">
+							<div class="filter-content">
+								<div>
+									<strong>Datos del interesado</strong>
+								</div>
+								<th:block
+									th:insert="~{fragments/filtro/datosPersonaCni :: persona('interesado','identificacionInteresado','contactoInteresado','domicilioInteresado','BusquedaExpedientesDto')}">
+								</th:block>
+							</div>
+						</div>
+						<div class="d-flex justify-content-between mt-3">
+							<button onclick="limpiarFiltros()" type="button" class="tertiary">
+								Limpiar todos los filtros <img
+									th:src="@{/static/images/delete.svg}"
+									alt="Eliminación de filtros">
+							</button>
+							<button class="primary" id="busquedaExpedientes" type="button"
+								th:attr="onclick=|validarBusquedaExpedientes('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}');|">Buscar</button>
+						</div>
+					</div>
+				</section>
+			</form>
+			<section id="resultadoBusqueda" class="card-container">
+				<div class="d-flex justify-content-between">
+					<span
+						th:text="${expedientesPage.totalElements} + ' resultados encontrados'"></span>
+					<button class="secondary">
+						Generar Excel<img th:src="@{/static/images/Vector.svg}"
+							alt="Generación de Excel">
+					</button>
+				</div>
+				<table aria-describedby="Tabla de expedientes">
+					<thead>
+						<tr>
+							<th></th>
+							<th scope="col" id="columnaExpediente">
+							<div class="d-flex align-items-center col-md-6 input-group">
+								<span>Expediente</span>
+								<button type="button" id="botonOrdenarNeutroExpediente"
+									th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'codExpediente') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'codExpediente' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','codExpediente');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+								</button>
+								<button type="button" id="botonOrdenarAscendenteExpediente"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda=='codExpediente'} and ${BusquedaExpedientesDto.tipoOrdenacionBusqueda=='ascendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','codExpediente');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+										alt="Ordenación Ascendente">
+								</button>
+								<button type="button" id="botonOrdenarDescendenteExpediente"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda=='codExpediente'} and ${BusquedaExpedientesDto.tipoOrdenacionBusqueda=='descendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+										alt="Ordenación Descendente">
+								</button>
+							</div>
+							</th>
+							<th scope="col" id="columnaExpediente">
+							<div class="d-flex align-items-center col-md-6 input-group">
+								<span>Respuesta informe</span>
+								<button type="button" id="botonOrdenarNeutroExpediente"
+									th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'respuestaInforme') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'respuestaInforme' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','respuestaInforme');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+								</button>
+								<button type="button" id="botonOrdenarAscendenteExpediente"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda=='respuestaInforme'} and ${BusquedaExpedientesDto.tipoOrdenacionBusqueda=='ascendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','respuestaInforme');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+										alt="Ordenación Ascendente">
+								</button>
+								<button type="button" id="botonOrdenarDescendenteExpediente"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda=='respuestaInforme'} and ${BusquedaExpedientesDto.tipoOrdenacionBusqueda=='descendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+										alt="Ordenación Descendente">
+								</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaNumIdentificacion">
+							<div class="d-flex align-items-center col-md-6 input-group">
+								<span>NIE</span>
+								<button type="button" id="botonOrdenarNeutroNIden"
+									th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'numIdentificacion') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'numIdentificacion' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','numIdentificacion');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary ">
+									<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+								</button>
+								<button type="button" id="botonOrdenarAscendenteNIden"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'numIdentificacion' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','numIdentificacion');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+										alt="Ordenación Ascendente">
+								</button>
+								<button type="button" id="botonOrdenarDescendenteNIden"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'numIdentificacion' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+										alt="Ordenación Descendente">
+								</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaNombre">
+							<div class="d-flex align-items-center col-md-6 input-group">
+								<span>Nombre</span>
+								<button type="button" id="botonOrdenarNeutroNom"
+									th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'nombreInteresado') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nombreInteresado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','nombreInteresado');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+								</button>
+								<button type="button" id="botonOrdenarAscendenteNom"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nombreInteresado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','nombreInteresado');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+										alt="Ordenación Ascendente">
+								</button>
+								<button type="button" id="botonOrdenarDescendenteNom"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nombreInteresado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+										alt="Ordenación Descendente">
+								</button>
+								</div>
+							</th>
+							<th scope="col">
+							<div class="d-flex align-items-center col-md-6 input-group">
+								<span>Apellido 1</span>
+								<button type="button" id="botonOrdenarNeutroApe1"
+									th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'apellido1Interesado') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido1Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','apellido1Interesado');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+								</button>
+								<button type="button" id="botonOrdenarAscendenteApe1"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido1Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','apellido1Interesado');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+										alt="Ordenación Ascendente">
+								</button>
+								<button type="button" id="botonOrdenarDescendenteApe1"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido1Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+										alt="Ordenación Descendente">
+								</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaApellido2">
+							<div class="d-flex align-items-center col-md-6 input-group">
+								<span>Apellido 2</span>
+								<button type="button" id="botonOrdenarNeutroApe2"
+									th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'apellido2Interesado') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido2Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','apellido2Interesado');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+								</button>
+								<button type="button" id="botonOrdenarAscendenteApe2"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido2Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','apellido2Interesado');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+										alt="Ordenación Ascendente">
+								</button>
+								<button type="button" id="botonOrdenarDescendenteApe2"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido2Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+										alt="Ordenación Descendente">
+								</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaNacionalidad">
+							<div class="d-flex align-items-center col-md-6 input-group">
+								<span>Nacionalidad</span>
+								<button type="button" id="botonOrdenarNacionalidad"
+									th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'nacionalidad') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nacionalidad' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','nacionalidad');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+								</button>
+								<button type="button" id="botonOrdenarAscendenteFCreacion"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nacionalidad' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','nacionalidad');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+										alt="Ordenación Ascendente">
+								</button>
+								<button type="button" id="botonOrdenarDescendenteFCreacion"
+									th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nacionalidad' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+									th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busquedaMde?idTarjeta=${BusquedaExpedientesDto.idTarjetaInicio}', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+									class="tertiary">
+									<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+										alt="Ordenación Descendente">
+								</button>
+								</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody id="contenidoTablaExpedientes">
+						<form id="formResponderMde" class="needs-validation" novalidate>
+							<tr th:each="tablaExps,iterstat : ${expedientesPage.content}">
+								<td><img th:if="${tablaExps.importante}" th:src="@{/static/images/warning-red.svg}"
+									alt="Expediente importante" title="Expediente importante"></td>
+								<td th:text="${tablaExps.codExp}"></td>
+								<td th:text="${tablaExps.respuestaInforme}"></td>
+								<td th:text="${tablaExps.numAcreditacionInteresado}"></td>
+								<td th:text="${tablaExps.nombreInteresado}"></td>
+								<td th:text="${tablaExps.apellido1Interesado}"></td>
+								<td th:text="${tablaExps.apellido2Interesado}"></td>
+								<td th:text="${tablaExps.nacionalidadInteresado}"></td>
+								<td><button
+										th:if="${tablaExps.estadoExpediente == 'Informe MDE solicitado' OR tablaExps.estadoExpediente == 'Informe MDE recibido' or #lists.contains(tablaExps.listaEstados, 'Informe MDE solicitado') or #lists.contains(tablaExps.listaEstados, 'Informe MDE recibido')}"
+										type="button" class="tertiary ms-auto"
+										th:attr="onclick=|responderMde('${tablaExps.idPer}', '${tablaExps.idExp}', '${tablaExps.codExp}', false)|">
+										<img th:src="@{/static/images/quick_reference.svg}"
+											alt="Responder MDE" title="Responder MDE">
+									</button></td>
+							</tr>
+						</form>
+					</tbody>
+				</table>
+				<dialog th:each="tablaExps,iterstat : ${expedientesPage.content}" th:id="|modalResponderMde${tablaExps.codExp}|" style="width:50%"> 
+				<th:block th:insert="~{fragments/modalResponderMde :: responderMde()}"></th:block> 
+				</dialog>
+				<th:block
+					th:replace="~{layout/paginador :: paginador(${expedientesPage},'formBusquedaExpedientes','busquedaExpedientes','resultadoBusqueda', ${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda}, ${BusquedaExpedientesDto.tipoOrdenacionBusqueda},'page',${pageNumbers})}">
+				</th:block>
+			</section>
+		</main>
+	</div>
+	<section name="footer" th:insert="~{layout/footer}"></section>
+</body>
+
+</html>

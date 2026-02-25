@@ -1,0 +1,143 @@
+<th:block th:fragment="informesCni()">
+	<form id="formCNI" name="formCNI" class="tab-content">
+		<div th:if="${modeloTramite.informeCNI!=null}" >
+			<div>
+				<strong>Datos del informe</strong>
+				<div class="info-container">
+					<small> 
+						<strong>Estado:</strong>
+						<div class="tag-container" th:id="${modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-VAL' ? 'checked' : modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-RCH' ||  modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-CAD' ? 'alert' : 'info'}">
+							<span th:text="${modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.nomLdvMae}"></span>
+						</div>
+					</small> 
+					<small> 
+            			<strong class="d-flex align-items-center">
+              				<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+              				title="Fecha en la que el sistema SINAC ha enviado la solicitud de informe al CNI. Ésta fecha servirá para el cálculo del plazo de respuesta del informe." class="me-1">
+            				Fecha de solicitud: </strong> 
+            			<span th:text="${#dates.format(modeloTramite.informeCNI?.fechaSolicitud, 'dd/MM/yyyy')}"
+							th:title="${modeloTramite.informeCNI?.fechaSolicitud}"></span>
+					</small> 
+					<small> 
+						<strong>
+							<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+	              				title=" Fecha en la que el CNI ha emitido la respuesta del informe. Esta fecha servirá para el cálculo del plazo de caducidad del informe." class="me-1">
+							Fecha de emisión:</strong> 
+						<span th:text="${#dates.format(modeloTramite.informeCNI?.fechaEmisionInf, 'dd/MM/yyyy')}"
+							th:title="${modeloTramite.informeCNI?.fechaEmisionInf}"></span>
+					</small>
+					<small> 
+						<strong>
+							<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+			            		title="Fecha en la que el sistema SINAC recibe la respuesta del informe." class="me-1">
+			            	Fecha de recepción:</strong> 
+						<span th:text="${#dates.format(modeloTramite.informeCNI?.fechaRecepcion, 'dd/MM/yyyy')}"
+							th:title="${modeloTramite.informeCNI?.fechaRecepcion}"></span>
+					</small>
+					<small> 
+						<strong>Edad:</strong> 
+						<span th:text="${modeloTramite.informeCNI?.edad}"></span>
+					</small> 
+				</div>
+			</div>
+			<div
+				th:if="${modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-REC' || modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-SOL'}">
+				<strong>Datos de respuesta</strong>
+				<div class="info-container pt-2"
+					th:if="${modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-REC'}">
+					<small> 
+						<strong>Sentido:</strong> 
+						<span th:text="${modeloTramite.informeCNI?.ldvMaestraDtoByIdSentidoInfLdv?.nomLdvMae}"></span>
+					</small>
+					<small>
+						<strong>Observaciones:</strong>
+						<span th:text="${modeloTramite.informeCNI?.info}"></span>
+					</small>
+				</div>
+				<div sinacsec:permisos="'P_TRAMITA'"
+					th:if="${modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-SOL'}"
+					class="d-flex flex-column gap-4 pt-3">
+					<div class="d-flex gap-3">
+						<div>
+							<select id="sentidoCni" name="sentidoCni" class="form-control">
+								<option th:each="sentido : ${@componentesComunesService.getComboSentidoCniDtoByCodLdvEntidadMaestra()}"
+									th:text="${sentido.nomLdvMae}" th:value="${sentido.codLdvMae}" th:if="${sentido.codLdvMae != 'CNI-APT' and sentido.codLdvMae != 'CNI-NAPT' and sentido.codLdvMae != 'CNI-SUSP'}"></option>
+							</select> <label for="sentidoCni">Sentido</label>
+						</div>
+					</div>
+	
+					<input type="hidden" name="idExpInfCni" id="idExpInfCni"
+						th:value="${modeloTramite.informeCNI?.idExpInf}">
+					<button
+						th:if="${modeloTramite.accionesOperaciones?.get('RCNI')?.get('ICNI') != null}"
+						sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('RCNI')?.get('ICNI')}"
+						type="button" class="primary ms-auto"
+						th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('RCNI')?.get('ICNI')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpInfCni','sentidoCni'])|">
+						Marcar informe como recibido</button>
+				</div>
+			</div>
+			<div class="d-flex">
+				<div class="d-flex gap-3 ms-auto">
+					<button sinacsec:permisos="'P_TRAMITA'"
+						th:if="${modeloTramite.accionesOperaciones?.get('RCEX')?.get('ICNI') != null}"
+						type="button" class="secondary me-auto" 
+						th:data-parameter1="${modeloTramite.comunicacionesExternasCNISolicitudMotivoRecepcion.nomLdvMae}"
+						th:data-parameter2="${modeloTramite.comunicacionesExternasCNISolicitudTipo.nomLdvMae}"
+						th:data-parameter3="${modeloTramite.comunicacionesExternasCNISolicitudOrgano.nomLdvMae}"
+						th:data-parameter4="${modeloTramite.comunicacionesExternasCNISolicitudMotivoRecepcion.idLdvMae}"
+						th:data-parameter5="${modeloTramite.comunicacionesExternasCNISolicitudTipo.idLdvMae}"
+						th:data-parameter6="${modeloTramite.comunicacionesExternasCNISolicitudOrgano.idLdvMae}"
+						th:data-parameter7="${modeloTramite.accionesOperaciones?.get('RCEX')?.get('ICNI')}"
+						th:onclick="abrirModalComunicacionesExternas(this.getAttribute('data-parameter1'), 
+							this.getAttribute('data-parameter2'), this.getAttribute('data-parameter3'), 'Centro Nacional de Inteligencia','ICNI',this.getAttribute('data-parameter4'), this.getAttribute('data-parameter5'), this.getAttribute('data-parameter6'), this.getAttribute('data-parameter7'))"
+						>Comunicaciones externas</button>
+					<input type="hidden" name="tipoInformeCni" id="tipoInformeCni" th:value="${modeloTramite.informeCNI.ldvMaestraDtoByIdInfLdv.codLdvMae}"/>
+					<div sinacsec:permisos="'P_TRAMITA'"
+						th:if="${modeloTramite.informeCNI?.idExpInf==null or modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-CAD'}">
+						<button
+							th:if="${modeloTramite.accionesOperaciones?.get('SCNI')?.get('ICNI') != null}" 
+							sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('SCNI')?.get('ICNI')}"
+							type="button" class="primary ms-auto"
+							th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('SCNI')?.get('ICNI')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['tipoInformeCni'])|">
+							Solicitar informe</button>
+					</div>
+				</div>
+			</div>
+			<div
+				th:if="${modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-REC' OR modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-FAV' OR modeloTramite.informeCNI?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-DES'}"
+				class="d-flex flex-column gap-4">
+				<div class="info-container">
+					 <small
+						th:if="${modeloTramite.informeCNI.expedienteDocumentoDto != null}">
+						<strong>Documento:</strong> <span
+						th:text="${modeloTramite.informeCNI.expedienteDocumentoDto?.nomDoc}"></span>
+					</small>
+				</div>
+				<div class="info-container"
+					th:if="${modeloTramite.expedienteComunicacionesExternasCni != null}">
+					<small> <strong>Descripción de comunicación:</strong> <span
+						th:text="${modeloTramite.expedienteComunicacionesExternasCni?.comDesc}"></span>
+					</small> <small> <strong>Fecha de comunicación:</strong> <span
+						th:text="${#dates.format( modeloTramite.expedienteComunicacionesExternasCni?.fechaCom, 'dd/MM/yyyy')}"></span>
+					</small>
+				</div>
+				<div class="d-flex gap-3 ms-auto" sinacsec:permisos="'P_TRAMITA'">
+					<input type="hidden" name="idExpInfCni" id="idExpInfCni"
+						th:value="${modeloTramite.informeCNI?.idExpInf}">
+					<button
+						th:if="${modeloTramite.accionesOperaciones?.get('CNIF')?.get('ICNI') != null}"
+						sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('CNIF')?.get('ICNI')}"
+						type="button" class="primary"
+						th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('CNIF')?.get('ICNI')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpInfCni'])|">
+						Marcar como favorable</button>
+					<button
+						th:if="${modeloTramite.accionesOperaciones?.get('CNID')?.get('ICNI') != null}"
+						sinacsec:permiso-accion="${modeloTramite.accionesOperaciones?.get('CNID')?.get('ICNI')}"
+						type="button" class="primary"
+						th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('CNID')?.get('ICNI')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpInfCni'])|">
+						Marcar como desfavorable</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</th:block>

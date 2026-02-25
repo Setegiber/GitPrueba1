@@ -1,0 +1,1479 @@
+<th:block th:fragment="informesDgp()">
+	<form id="formDGP" name="formDGP" class="tab-content active">
+		<div th:if="${modeloTramite.informeDGP!=null}">
+			<strong>Datos del informe</strong>
+			<div class="info-container">
+				<small>
+					<strong>Estado</strong>
+					<div class="tag-container"
+						th:id="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-VAL' ? 'checked' : modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-RCH' ||  modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-CAD' ? 'alert' : 'info'}">
+						<span th:text="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.nomLdvMae}"></span>
+					</div>
+				</small>
+				<small>
+					<strong class="d-flex align-items-center">
+						<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+							title="Fecha en la que el sistema SINAC ha enviado la solicitud del informe a la DGP. Esta fecha servirá para el cálculo del plazo de respuesta del informe."
+							class="me-1">
+						Fecha de solicitud</strong>
+					<span th:text="${#dates.format(modeloTramite.informeDGP?.fechaSolicitud, 'dd/MM/yyyy')}"
+						th:title="${modeloTramite.informeDGP?.fechaSolicitud}"></span>
+				</small>
+				<small>
+					<strong class="d-flex align-items-center">
+						<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+							title="Fecha en la que la DGP ha emitido la respuesta del informe. Esta fecha servirá para el cálculo del plazo de caducidad del informe."
+							class="me-1">
+						Fecha de emisión</strong>
+					<span th:text="${#dates.format(modeloTramite.informeDGP?.fechaEmisionInf, 'dd/MM/yyyy')}"
+						th:title="${modeloTramite.informeDGP?.fechaEmisionInf}"></span>
+				</small>
+				<small>
+					<strong class="d-flex align-items-center">
+						<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+							title="Fecha en la que el sistema SINAC recibe la respuesta del informe." class="me-1">
+						Fecha de recepción</strong>
+					<span th:text="${#dates.format(modeloTramite.informeDGP?.fechaRecepcion, 'dd/MM/yyyy')}"
+						th:title="${modeloTramite.informeDGP?.fechaRecepcion}"></span>
+				</small>
+				<small>
+					<strong>Edad del interesado</strong>
+					<span th:text="${modeloTramite.informeDGP?.edad}"></span>
+				</small>
+			</div>
+		</div>
+		<br />
+		<div th:if="${modeloTramite.informeDGP?.expedienteInformeDgpDto!=null}">
+			<div th:if="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae != 'EINF-PEN'}">
+				<strong>Datos de solicitud</strong>
+				<div class="info-container">
+					<small>
+						<strong>Número expediente Adexttra</strong>
+						<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.numExpAdexttra}"
+							th:title="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.numExpAdexttra}"></span>
+					</small>
+					<small>
+						<strong>Código estado solicitud</strong>
+						<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codEstadoAlta}"
+							th:title="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codEstadoAlta}"></span>
+					</small>
+					<small>
+						<strong>Código estado secundario solicitud</strong>
+						<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codEstadoAltaSec}"
+							th:title="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codEstadoAltaSec}"></span>
+					</small>
+					<small>
+						<strong>Mensaje solicitud</strong>
+						<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.literalErrAlta}"
+							th:title="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.literalErrAlta}"></span>
+					</small>
+				</div>
+			</div>
+			<div th:if="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae!='EINF-SOL'
+				AND modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae!='EINF-PEN'}" id="detalleRespuestaDgp">
+				<strong>Resultado informe</strong>
+				<div class="info-container pt-2">
+					<small>
+						<strong>Código estado respuesta</strong>
+						<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codEstRes}"
+							th:title="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codEstRes}"></span>
+					</small>
+					<small>
+						<strong>Código estado secundario respuesta</strong>
+						<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codEstadoSec}"
+							th:title="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codEstadoSec}"></span>
+					</small>
+					<small>
+						<strong>Mensaje respuesta</strong>
+						<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.literalErrRes}"
+							th:title="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.literalErrRes}"></span>
+					</small>
+					<small>
+					</small>
+					<small>
+						<strong>Sentido del informe</strong>
+						<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.antecedentes}"
+							th:title="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.antecedentes}"></span>
+					</small>
+					<small th:if="${modeloTramite.informeDGP?.expedienteDocumentoDto==null 
+			        	AND (modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-REC'
+			            OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-DES'
+			            OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-FAV'
+			            OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-CAD')}" class="d-block">
+						<strong>Informe DGP</strong>
+						<div class="d-inline-block">
+							<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+								title="El informe ha sido recibido pero no se ha podido generar el documento."
+								class="me-1">
+						</div>
+						<button type="button" class="tertiary" id="abrirDetalleDoc" th:if="${modeloTramite.informeDGP?.expedienteDocumentoDto==null 
+			            AND (modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-REC'
+			            OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-DES'
+			            OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-FAV'
+			            OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-CAD')}"
+							th:attr="onclick=|generarDocumentoDgp('${modeloTramite.idExp}', '${modeloTramite.informeDGP?.idExpInf}')|">
+							<img th:src="@{/static/images/sync.svg}" alt="Generar documento DGP"
+								title="Generar documento DGP">
+						</button>
+					</small>
+					<small th:if="${modeloTramite.informeDGP?.expedienteDocumentoDto!=null 
+							AND (modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-REC'
+							OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-DES'
+							OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-FAV'
+							OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-CAD')}">
+						<strong>Informe DGP</strong>
+						<span hidden="hidden" th:value="${modeloTramite.informeDGP}"></span>
+						<div class="row row-no-gutters">
+							<div class="col-sm-2">
+								<button type="button" class="tertiary" id="abrirDetalleDoc"
+									th:if="${modeloTramite.informeDGP?.expedienteDocumentoDto.idExpDoc != null}"
+									th:attr="onclick=|abrirModal('${modeloTramite.informeDGP?.expedienteDocumentoDto.idExpDoc}')|">
+									<img th:src="@{/static/images/find_in_page.svg}" alt="Modal del detalle">
+								</button>
+								<dialog th:id="'modal' + ${modeloTramite.informeDGP?.expedienteDocumentoDto.idExpDoc}">
+									<th:block
+										th:insert="~{fragments/detalleDocumento :: detalleDocumento('formDGP', (${modeloTramite.informeDGP?.expedienteDocumentoDto}))}">
+									</th:block>
+								</dialog>
+							</div>
+							<div class="col-sm-2">
+								<button type="button" th:data-parameter1="${modeloTramite.idExp}"
+									th:data-parameter2="${modeloTramite.informeDGP?.expedienteDocumentoDto.idExpDoc}"
+									th:onclick="descargarDocumentoOriginal(this.getAttribute('data-parameter1'), this.getAttribute('data-parameter2'))"
+									class="tertiary"><img th:src="@{/static/images/download.svg}"
+										alt="Descarga de documento"></button>
+							</div>
+						</div>
+					</small>
+				</div>
+			</div>
+			<div class="d-flex" id="botonesDgpActualizar">
+				<button class="secondary" id="botonInformeDgp" type="button" onclick="mostrarInformeCompletoDGP()"
+					th:if="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae != 'EINF-SOL'
+					AND modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae != 'EINF-PEN'}">
+					Ver informe completo</button>
+				<div class="d-flex gap-3 ms-auto" id="mostrarInformeLecturaDgp" sinacsec:permisos="'P_TRAMITA'" th:if="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-REC' 
+					OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-RCH' 
+					OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-FAV' 
+					OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-DES'}">
+					<input type="hidden" name="idExpInf" id="idExpInf" th:value="${modeloTramite.informeDGP?.idExpInf}">
+					<button type="button" class="primary"
+						th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('DGPF')?.get('IDGP')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpInf'])|"
+						th:if="${modeloTramite.accionesOperaciones?.get('DGPF')?.get('IDGP') != null}">
+						Marcar como favorable</button>
+					<button type="button" class="primary"
+						th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('DGPD')?.get('IDGP')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpInf'])|"
+						th:if="${modeloTramite.accionesOperaciones?.get('DGPD')?.get('IDGP') != null}">
+						Marcar como desfavorable</button>
+				</div>
+			</div>
+			<div th:if="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae!='EINF-SOL'
+			AND modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae!='EINF-PEN'}" id="informeCompletoDgp"
+				style="display:none;">
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('datosInteresadoDGP_div', 'datosInteresado_img')">
+						<strong>Interesado</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="datosInteresadoDGP_div">
+						<div class="field-container">
+							<div class="dropdown-content pt-2">
+								<small>Datos personales</small>
+								<div>
+									<div class="dropdown-content pt-2 info-container">
+										<div>
+											<small>
+												<strong>Identificador</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.identificador}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombre}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>1º apellido</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.apellido1}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>2º apellido</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.apellido2}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre anterior</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nomAnterior}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Sexo</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.sexo}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha nacimiento</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaNacimiento}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Estado civil</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.estadoCivil}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Código nacimiento</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codNacimiento}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Lugar nacimiento</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.lugarNacimiento}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Código nacionalidad</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codNacionalidad}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre padre</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombrePadre}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre madre</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombreMadre}"></span>
+											</small>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="field-container--divisor"></div>
+							<div class="dropdown-content pt-2">
+								<small>Datos de contacto</small>
+								<div>
+									<div class="dropdown-content pt-2 info-container">
+										<div>
+											<small>
+												<strong>Teléfono fijo</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.telefonoFijo}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Teléfono móvil</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.telefonoMovil}"></span>
+											</small>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="field-container--divisor"></div>
+							<div class="dropdown-content pt-3">
+								<small>Datos del domicilio</small>
+								<div>
+									<div class="dropdown-content pt-2 info-container">
+										<div>
+											<small>
+												<strong>Tipo vía</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.tipoVia}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre vía</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombreVia}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Número</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.numero}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Portal</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.portal}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Escalera</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.escalera}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Bloque</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.bloque}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Planta</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.planta}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Puerta</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.puerta}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Kilómetro</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.kilometro}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hectómetro</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.hectometro}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Localidad</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.localidad}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Código provincia residencia</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codProvReside}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Código postal</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codPostal}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Dirección normalizada</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.direccionNNor}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Población normalizada</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.poblacionNNor}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Código normalizado</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.codigoNNor}"></span>
+											</small>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="field-container--divisor"></div>
+							<div class="dropdown-content pt-3">
+								<small>Datos del cónyuge</small>
+								<div>
+									<div class="dropdown-content pt-2 info-container">
+										<div>
+											<small>
+												<strong>Nombre cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombreConyuge}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>1º apellido cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape1Conyuge}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>2º apellido cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape2Conyuge}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nacionalidad cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nacConyuge}"></span>
+											</small>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="field-container--divisor"></div>
+							<div class="dropdown-content pt-3">
+								<div>
+									<div class="dropdown-content pt-2 info-container">
+										<div>
+											<small>
+												<strong>Fecha salida</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaSalida}"></span>
+											</small>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeDocumentoDGP_div', 'datosInteresado_img')">
+						<strong>Informe documento</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeDocumentoDGP_div">
+						<div class="dropdown-content pt-2 info-container">
+							<div>
+								<small>
+									<strong>Clase documento</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.claseDocumento}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Nº documento</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.numDocumento}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>País expedición</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.paisExpedicion}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Lugar expedición</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.lugarExpedicion}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Fecha expedición</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaExpedicion}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Fecha caducidad</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaCaducidad}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Fecha renove</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaRenove}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Fecha caducidad renove</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaRenoveCadu}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Obvservación documento</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.observacionDoc}"></span>
+								</small>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeSitExtDGP_div', 'datosInteresado_img')">
+						<strong>Informe situación extranjero</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeSitExtDGP_div">
+						<div class="dropdown-content pt-2 info-container">
+							<div>
+								<small>
+									<strong>Legal irregular</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.legalIrregular}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Tipo permiso</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.tipoPermiso}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Ausencias</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ausencias}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Entrevista</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.entrevista}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Motivo no</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.motivoNo}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Dni español</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.dniEspanol}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Lugar 1ª expedición</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.lugarExpPri}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Fecha 1ª expedición</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaExpPri}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Fecha caducidad 1ª exp.</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaCaduPri}"></span>
+								</small>
+							</div>
+							<table border="1" aria-describedby="Tabladesituacion">
+								<thead>
+									<tr>
+										<th>Lugar Renovacion Dni</th>
+										<th>Fecha Renovacion Dni</th>
+										<th>Fecha Caducidad Dni</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr
+										th:each="renovacion, iterstat : ${modeloTramite.informeDGP?.expedienteInformeDgpDto?.renovacionDniDtos}">
+										<td><span th:text="${renovacion.lugarRenDni}"></span></td>
+										<td><span th:text="${renovacion.fechaRenDni}"></span></td>
+										<td><span th:text="${renovacion.fechaCadDni}"></span></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeSitFamiliar_div', 'datosInteresado_img')">
+						<strong>Informe situación familiar</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeSitFamiliar_div">
+						<div class="field-container">
+							<div class="dropdown-content pt-2">
+								<small>Situación con extranjero</small>
+								<div>
+									<div class="dropdown-content pt-2 info-container">
+										<div>
+											<small>
+												<strong>Estado civil</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.estCivilExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombreConExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>1º apellido cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape1ConExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>2º apellido cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape2ConExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Tipo permiso</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.tipoPerExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha nacimiento</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaNacExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Lugar nacimiento</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.lugarNacExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hijo menor espa extra</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.menorEspaExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hijo menor fuera</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.menorFueExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hijo Mayor domicilio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.mayorDomExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hijo anterior soli.</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.hijoSoli}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hijo anterior cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.hijoCon}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha matrimonio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaMatriExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Lugar matrimonio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.lugarMatriExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Conviven extra</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.convivenExtra}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre persona convive</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nomPerConDis}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>1º apellido persona convive</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape1PerConDis}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>2º apellido persona convive</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape2PerConDis}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Tipo permiso persona convive</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.tPePerConDis}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha nacimiento persona convive</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fNaPerConDis}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Lugar nacimiento persona convive</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.lNaPerConDis}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Observación persona convive</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.obsPerConDis}"></span>
+											</small>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="field-container--divisor"></div>
+							<div class="dropdown-content pt-2">
+								<small>Situación con español</small>
+								<div>
+									<div class="dropdown-content pt-2 info-container">
+										<div>
+											<small>
+												<strong>Estado civil</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.estCivEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nomConEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>1º apellido cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape1ConEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>2º apellido cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape2ConEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nº Dni cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.numDniConEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha nacimiento cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fNacConEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Lugar nacimiento cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.lNacConEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hijo menor español</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.menorEspaEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hijo menor fuera</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.menorFueEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Hijo mayor domicilio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.mayorDomEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha matrimonio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaMatEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Lugar matrimonio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.lugarMatEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Conviven matrimonio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.conviEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Separación</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.separacion}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha separación</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaSeparacion}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Juzgado separación</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.juzgSeparacion}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Divorcio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.divorcioEsp}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha divorcio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fechaDivorcio}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Juzgado divorcio</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.juzgDivorcio}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Fecha fallecimento cónyuge</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.fFallecimento}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Convivía con cónyuge fallecido</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.convivian}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Nombre persona convive distinta</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombreDistinta}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>1º apellido persona convive distinta</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape1Distinta}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>2º apellido persona convive distinta</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape2Distinta}"></span>
+											</small>
+										</div>
+										<div>
+											<small>
+												<strong>Observación convive persona distinta</strong>
+												<span
+													th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.obsDistinta}"></span>
+											</small>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeActividadVida_div', 'datosInteresado_img')">
+						<strong>Informe actividad vida</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeActividadVida_div">
+						<div class="dropdown-content pt-2 info-container">
+							<div>
+								<small>
+									<strong>Profesión</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.profesion}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Nombre empresa</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombreEmpresa}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Domicilio social</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.domicilioSocial}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Cuenta propia ajena</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.cuentaPropiaAj}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Tipo contrato</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.tipoContrato}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Ingreso mensual</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ingresoMes}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Concepto</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.concepto}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Régimen vivienda</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.regimenVivienda}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Actividad</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.actividad}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Ingreso mensual cónyuje</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ingresoMesCon}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Nombre persona dependiente económica</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.nombreDepende}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>1º apellido persona dependiente económica</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape1Depende}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>2º apellido persona dependiente económica</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ape2Depende}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Parentesco</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.parentesco}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Ingreso mensual dependiente económica</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.ingresoMesDep}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Arraigo</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.arraigo}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Motivo</strong>
+									<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.motivo}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Habla español</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.hablaEspanol}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Observación actividad</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.obsActividad}"></span>
+								</small>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeOtrosDatos_div', 'datosInteresado_img')">
+						<strong>Informe otros datos</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeOtrosDatos_div">
+						<div class="dropdown-content pt-2 info-container">
+							<small>
+								<strong>Otros</strong>
+								<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.otros}"></span>
+							</small>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeDatosContrarios_div', 'datosInteresado_img')">
+						<strong>Datos contrarios</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeDatosContrarios_div">
+						<div class="dropdown-content pt-2 info-container">
+							<div>
+								<small>
+									<strong>Vínculo país</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.vinculoPais}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Vínculo reivin.</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.vinculoReivin}"></span>
+								</small>
+							</div>
+							<div>
+								<small>
+									<strong>Actividad contraria</strong>
+									<span
+										th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.actContraria}"></span>
+								</small>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeTramites_div', 'datosInteresado_img')">
+						<strong>Informe trámites</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeTramites_div">
+						<div class="dropdown-content pt-2">
+							<table border="1" aria-describedby="Tabladeinforme">
+								<thead>
+									<tr>
+										<th>Trámite</th>
+										<th>Lugar Concesion</th>
+										<th>Fecha Solicitud</th>
+										<th>Fecha Concesión</th>
+										<th>Fecha Validez</th>
+										<th>Fecha Denegación</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr
+										th:each="tramite, iterstat : ${modeloTramite.informeDGP?.listaExpedienteInformeDgpTramiteDtos}">
+										<td><span th:text="${tramite.tramite}"></span></td>
+										<td><span th:text="${tramite.lugarConcesion}"></span></td>
+										<td><span
+												th:text="${tramite.fechaSolicitud != null ? #dates.format(tramite.fechaSolicitud,'dd/MM/yyyy') : ''}"></span>
+										</td>
+										<td><span
+												th:text="${tramite.fechaConcesion != null ? #dates.format(tramite.fechaConcesion,'dd/MM/yyyy') : ''}"></span>
+										</td>
+										<td><span
+												th:text="${tramite.fechaValidez != null ? #dates.format(tramite.fechaValidez,'dd/MM/yyyy') : ''}"></span>
+										</td>
+										<td><span
+												th:text="${tramite.fechaDenegacion != null ? #dates.format(tramite.fechaDenegacion,'dd/MM/yyyy') : ''}"></span>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+
+							<div th:if="${modeloTramite.expediente.procedimientoDto.codCorto == 'R'}">
+								<div class="dropdown-content pt-4 info-container">
+									<div>
+										<small>
+											<strong>Periodo de residencia legal ininterrumpida:</strong>
+											<span
+												th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.periodoIninterrumpido}"></span>
+										</small>
+									</div>
+									<div>
+										<small>
+											<strong>Periodo de residencia exigido:</strong>
+											<span
+												th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.periodoExigido != null ? (modeloTramite.informeDGP.expedienteInformeDgpDto.periodoExigido + ' Años') : '-'}">
+											</span>
+										</small>
+									</div>
+									<div>
+										<small>
+											<strong>Fecha inicial del cálculo:</strong>
+											<span
+												th:text="${modeloTramite.expediente?.fechaEfectos != null ? #dates.format(modeloTramite.expediente?.fechaEfectos, 'dd/MM/yyyy'): ''}">-</span>
+										</small>
+									</div>
+									<div class="d-flex flex-row gap-4 ms-auto my-2">
+										<div id="validacionResiLegal" name="validacionResiLegal">
+											<select id="residenciaLegal" name="residenciaLegal"
+												th:field="${modeloTramite.valSemResLegal.idEstadoValLdv.codLdvMae}"
+												class="form-control validacion">
+												<option
+													th:each="estado : ${@componentesComunesService.getComboEstadoDocumentoValidacion('VAL_RLE')}"
+													th:text="${estado.nomLdvMae}" th:value="${estado.codLdvMae}" />
+											</select>
+											<label for="residenciaLegal">Residencia Legal</label>
+										</div>
+										<div>
+											<button type="button" class="secondary guardarValidacion mt-2" id="guardarValidacion"
+												th:attr="onclick=|guardarEstadoValidacionSemaforo(['validacionResiLegal'], '${requestURI}', 'formDGP')|">
+												Guardar<img th:src="@{/static/images/save-18-blue.svg}" alt="Guardar">
+											</button>
+										</div>
+									</div>
+								</div>
+								<span class="text-danger">*El cálculo del periodo de residencia está realizado por
+									SINAC</span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeAntecedentes_div', 'datosInteresado_img')">
+						<strong>Informe antecedentes</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeAntecedentes_div">
+						<div class="dropdown-content pt-2 info-container">
+							<small>
+								<strong>Antecedentes</strong>
+								<span
+									th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.antecedentes}"></span>
+							</small>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="dropdown-container w-100">
+					<header onclick="dropdownContent('informeOtrosAntecedentes_div', 'datosInteresado_img')">
+						<strong>Informe otros antecedentes</strong> <img id="datosInteresado_img"
+							th:src="@{/static/images/arrow_drop_down.svg}" alt="Flecha desplegable">
+					</header>
+					<div id="informeOtrosAntecedentes_div">
+						<div class="dropdown-content pt-2 info-container">
+							<small>
+								<strong>Otros antecedentes</strong>
+								<span th:text="${modeloTramite.informeDGP?.expedienteInformeDgpDto?.icgi}"></span>
+							</small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="d-flex">
+			<div class="d-flex gap-3 ms-auto">
+				<button sinacsec:permisos="'P_TRAMITA'"
+					th:if="${modeloTramite.accionesOperaciones?.get('RCEX')?.get('IDGP') != null}" type="button"
+					class="secondary me-auto"
+					th:data-parameter1="${modeloTramite.comunicacionesExternasDGPSolicitudMotivoRecepcion.nomLdvMae}"
+					th:data-parameter2="${modeloTramite.comunicacionesExternasDGPSolicitudTipo.nomLdvMae}"
+					th:data-parameter3="${modeloTramite.comunicacionesExternasDGPSolicitudOrgano.nomLdvMae}"
+					th:data-parameter4="${modeloTramite.comunicacionesExternasDGPSolicitudMotivoRecepcion.idLdvMae}"
+					th:data-parameter5="${modeloTramite.comunicacionesExternasDGPSolicitudTipo.idLdvMae}"
+					th:data-parameter6="${modeloTramite.comunicacionesExternasDGPSolicitudOrgano.idLdvMae}"
+					th:data-parameter7="${modeloTramite.accionesOperaciones?.get('RCEX')?.get('IDGP')}"
+					th:onclick="abrirModalComunicacionesExternas(this.getAttribute('data-parameter1'), 
+						this.getAttribute('data-parameter2'), this.getAttribute('data-parameter3'), 'Dirección General de la Policía','IDGP',this.getAttribute('data-parameter4'), this.getAttribute('data-parameter5'), this.getAttribute('data-parameter6'), this.getAttribute('data-parameter7'))">Comunicaciones
+					externas</button>
+				<input type="hidden" name="tipoInformeDgp" id="tipoInformeDgp"
+					th:value="${modeloTramite.informeDGP.ldvMaestraDtoByIdInfLdv.codLdvMae}">
+			</div>
+		</div>
+		<div th:if="${not #lists.isEmpty(modeloTramite.informeDGP.historicoDgp)}">
+			<br />
+			<div id="historicoDgp">
+				<strong>Histórico informes Dgp</strong>
+				<section class="card-container">
+					<table aria-describedby="Tabla de trámites">
+						<thead>
+							<tr>
+								<th></th>
+								<th scope="col">Id solicitud</th>
+								<th scope="col">Estado solicitud</th>
+								<th scope="col">
+									<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+										title="Fecha en la que el sistema SINAC ha enviado la solicitud del informe a la DGP. Ésta fecha servirá para el cálculo del plazo de respuesta del informe."
+										class="me-1">
+									Fecha de solicitud
+								</th>
+								<th scope="col">
+									<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+										title="Fecha en la que el sistema SINAC recibe la respuesta del informe."
+										class="me-1">
+									Fecha de emisión
+								</th>
+								<th scope="col">
+									<img th:src="@{/static/images/info.svg}" alt="Información" data-bs-toggle="tooltip"
+										title="Fecha en la que la DGP ha emitido la respuesta del informe. Esta fecha servirá para el cálculo del plazo de caducidad del informe."
+										class="me-1">
+									Fecha de recepción
+								</th>
+								<th scope="col"></th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="informe: ${modeloTramite.informeDGP.historicoDgp}">
+								<td>
+									<img th:src="@{/static/images/Badge.svg}" alt="Información de respuesta">
+								</td>
+								<td th:text="${informe.idSolicitudInforme}">
+								</td>
+								<td>
+									<div class="tag-container"
+										th:id="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-VAL' ? 'checked' : modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-RCH' ||  modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-CAD' ? 'alert' : 'info'}">
+										<span th:text="${informe.ldvMaestraDtoByIdEstInfLdv?.nomLdvMae}"></span>
+									</div>
+								</td>
+								<td th:text="${#dates.format(informe.fechaSolicitud, 'dd/MM/yyyy')}">
+								</td>
+								<td th:text="${#dates.format(informe.fechaRecepcion, 'dd/MM/yyyy')}">
+								</td>
+								<td th:text="${#dates.format(informe.fechaEmisionInf, 'dd/MM/yyyy')}">
+								</td>
+								<td>
+									<div class="d-flex">
+										<button th:if="${informe.expedienteDocumentoDto != null}" type="button"
+											onclick="menuDesplegable(this)" id="menuButton" class="tertiary ms-auto"
+											th:disabled="${informe.expedienteDocumentoDto?.ldvMaestraDtoByIdEstDocLdv == null}">
+											<img th:src="@{/static/images/more_vert.svg}" alt="Más opciones">
+										</button>
+									</div>
+									<div id="menu" class="menu">
+										<div th:if="${informe.expedienteDocumentoDto!=null 
+										AND (informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-REC'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-DES'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-FAV'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-CAD')}">
+											<button type="button" class="tertiary" id="abrirDetalleDoc"
+												th:attr="onclick=|abrirModal('${informe.expedienteDocumentoDto.idExpDoc}')|"><img
+													th:src="@{/static/images/find_in_page.svg}" alt="Modal del detalle">
+												Ver detalle</button>
+											<dialog th:id="'modal' + ${informe.expedienteDocumentoDto.idExpDoc}">
+												<th:block
+													th:insert="~{fragments/detalleDocumento :: detalleDocumento('formDGP', (${informe.expedienteDocumentoDto}))}">
+												</th:block>
+											</dialog>
+										</div>
+										<button th:if="${informe.expedienteDocumentoDto!=null 
+										AND (informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-REC'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-DES'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-FAV'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-CAD')}" type="button"
+											th:data-parameter1="${modeloTramite.idExp}"
+											th:data-parameter2="${informe.expedienteDocumentoDto.idExpDoc}"
+											th:onclick="descargarDocumentoOriginal(this.getAttribute('data-parameter1'), this.getAttribute('data-parameter2'))"
+											class="tertiary"><img th:src="@{/static/images/download.svg}"
+												alt="Descarga de documento">Descargar</button>
+										<button
+											th:if="${informe.expedienteDocumentoDto!=null 
+										AND (informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-REC'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-DES'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-FAV'
+										OR informe.ldvMaestraDtoByIdEstInfLdv?.codLdvMae=='EINF-CAD')
+										AND (informe.expedienteDocumentoDto.ldvMaestraDtoByIdEstDocLdv != null and (informe.expedienteDocumentoDto?.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-FIR' or informe.expedienteDocumentoDto?.ldvMaestraDtoByIdEstDocLdv?.codLdvMae == 'EDOC-FRE' or informe.expedienteDocumentoDto?.documentoTipoDto?.codTipo == 'CARAP'))}"
+											type="button" th:data-parameter1="${modeloTramite.idExp}"
+											th:data-parameter2="${informe.expedienteDocumentoDto.idExpDoc}"
+											th:onclick="descargarDocumentoCopiaAutentica(this.getAttribute('data-parameter1'),this.getAttribute('data-parameter2'));"
+											class="tertiary"><img th:src="@{/static/images/file_save.svg}"
+												alt="Descarga de copia auténtica">Descargar copia auténtica</button>
+									</div>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+			</div>
+		</div>
+		<div sinacsec:permisos="'P_TRAMITA'"
+			th:if="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-REC' OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-RCH' OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-FAV' OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-DES'}">
+			<div id="mostrarInformeLecturaDgp">
+				<div class="info-container" th:if="${modeloTramite.expedienteComunicacionesExternasDgp != null}">
+					<small>
+						<strong>Descripción de comunicación</strong>
+						<span th:text="${modeloTramite.expedienteComunicacionesExternasDgp?.comDesc}"></span>
+					</small>
+					<small>
+						<strong>Fecha de comunicación</strong>
+						<span
+							th:text="${#dates.format(modeloTramite.expedienteComunicacionesExternasDgp?.fechaCom, 'dd/MM/yyyy')}"></span>
+					</small>
+				</div>
+			</div>
+		</div>
+		<!-- <div  sinacsec:permisos="'P_TRAMITA'"
+			th:if="${modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-REC' OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-RCH' OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-FAV' OR modeloTramite.informeDGP?.ldvMaestraDtoByIdEstInfLdv?.codLdvMae == 'EINF-DES'}">
+			<div id="mostrarInformeLecturaDgp">
+				<div class="d-flex flex-column gap-4">
+					<div class="info-container"
+						th:if="${modeloTramite.expedienteComunicacionesExternasDgp != null}">
+						<small> 
+							<strong>Descripción de comunicación</strong>
+							<span th:text="${modeloTramite.expedienteComunicacionesExternasDgp?.comDesc}"></span>
+						</small> 
+						<small> 
+							<strong>Fecha de comunicación</strong> 
+              				<span th:text="${#dates.format(modeloTramite.expedienteComunicacionesExternasDgp?.fechaCom, 'dd/MM/yyyy')}"></span>
+						</small>
+					</div>
+					<div class="d-flex gap-3">
+						<input type="hidden" name="idExpInf" id="idExpInf"
+							th:value="${modeloTramite.informeDGP?.idExpInf}">
+						<button type="button" class="primary"
+							th:if="${modeloTramite.accionesOperaciones?.get('DGPF')?.get('IDGP') != null}"
+							th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('DGPF')?.get('IDGP')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpInf'])|">
+							Marcar como favorable</button>
+						<button type="button" class="primary"
+							th:if="${modeloTramite.accionesOperaciones?.get('DGPD')?.get('IDGP') != null}"
+							th:attr="onclick=|ejecutaAccionTramitacion('${modeloTramite.accionesOperaciones?.get('DGPD')?.get('IDGP')}', '${modeloTramite.idExp}', '${modeloTramite.codTramite}', ['idExpInf'])|"> 
+							Marcar como desfavorable</button>
+					</div>
+				</div>
+			</div>
+		</div> -->
+	</form>
+	<form action="#" id="formGenerarDgp" method="post"></form>
+</th:block>

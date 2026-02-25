@@ -1,0 +1,106 @@
+<th:block th:fragment="requerimientosYAudiencias">
+  <div id="requerimientosYAudiencias" class="d-flex flex-column gap-4">
+    <dialog id="modalRequerimientosYAudiencias" class="sideSheet">
+      <header class="d-flex flex-column">
+        <div class="d-flex align-items-center gap-4">
+          <h4>Requerimientos y audiencias</h4>
+          <img src="/sinac-core/static/images/icon.svg" alt="Cierre de modal" class="ms-auto" onclick="cerrarModal('RequerimientosYAudiencias')" />
+        </div>
+        <nav class="nav-tab requerimientosYAudiencias">
+          <a id="reqRef" href="#req" class="tab active">Requerimientos</a>
+          <a id="audRef" href="#aud" class="tab">Audiencias</a>
+        </nav>
+      </header>
+      <main id="mainRequerimientosYAudiencias" class="p-3 m-3">
+        <section id="req" class="tab-content">
+          <div th:if="${modeloTramite.accionesOperaciones?.get('GEND')?.get('GREQ') == null or reqTiposOficiosAndDocumentosToRequerir == null or #lists.size(reqTiposOficiosAndDocumentosToRequerir) == 0}" style="border-bottom: 1px solid #8d9dab !important; padding-bottom: 32px !important;">
+            <article>
+              <div class="dropdown-container">
+                En este momento no se pueden generar requerimientos.
+              </div>
+            </article>
+          </div>
+          <div id="reqGenerar" th:if="${modeloTramite.accionesOperaciones?.get('GEND')?.get('GREQ') != null and reqTiposOficiosAndDocumentosToRequerir != null and #lists.size(reqTiposOficiosAndDocumentosToRequerir) > 0}">
+            <article>
+              <div class="dropdown-container">
+                <header onclick="dropdownContent('reqCollapse0', 'reqArrowDropDown0')">
+                  <strong id="reqHeaderGenerar">Requerimiento</strong>
+                  <img id="reqArrowDropDown0" class="arrow-drop-down-img" src="/sinac-core/static/images/arrow_drop_down.svg" alt="Flecha desplegable" />
+                </header>
+                <div id="reqCollapse0" class="accordion-div" style="display: none;">
+                  <div class="dropdown-content">
+                    <div th:insert="~{fragments/crearRequerimientoYAudiencia :: crearRequerimientoYAudiencia('req', ${reqTiposOficiosAndDocumentosToRequerir})}"></div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div id="reqNoExisten" th:if="${#lists.isEmpty(requerimientos)}">
+            <article>
+              <div class="dropdown-container">El expediente no tiene requerimientos.</div>
+            </article>
+          </div>
+          <div th:if="${not #lists.isEmpty(requerimientos)}" th:each="requerimiento,rowStat : ${requerimientos}">
+            <article>
+              <div th:id="|reqSection${requerimiento?.idExpReq}|" class="dropdown-container">
+                <header th:onclick="dropdownContent('reqCollapse' + [[${requerimiento?.idExpReq}]], 'reqArrowDropDown' + [[${requerimiento?.idExpReq}]])">
+                  <strong th:text="|Requerimiento ${rowStat.size-rowStat.index}|"></strong>
+                  <img th:id="|reqArrowDropDown${requerimiento?.idExpReq}|" class="arrow-drop-down-img" src="/sinac-core/static/images/arrow_drop_down.svg" alt="Flecha desplegable" />
+                </header>
+                <div th:id="|reqCollapse${requerimiento?.idExpReq}|" class="accordion-div" style="display: none;">
+                  <div class="dropdown-content">
+                    <div th:insert="~{fragments/detalleRequerimientoYAudiencia :: cargarRequerimientoYAudiencia('req', ${requerimiento})}"></div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+        <section id="aud" class="tab-content">
+          <div th:if="${modeloTramite.accionesOperaciones?.get('GEND')?.get('GAUD') == null or audTiposOficiosAndDocumentosToRequerir == null or #lists.size(audTiposOficiosAndDocumentosToRequerir) == 0}" style="border-bottom: 1px solid #8d9dab !important; padding-bottom: 32px !important;">
+            <article>
+              <div class="dropdown-container">
+                En este momento no se pueden generar audiencias.
+              </div>
+            </article>
+          </div>
+          <div id="audGenerar" th:if="${modeloTramite.accionesOperaciones?.get('GEND')?.get('GAUD') != null and audTiposOficiosAndDocumentosToRequerir != null and #lists.size(audTiposOficiosAndDocumentosToRequerir) > 0}">
+            <article>
+              <div class="dropdown-container">
+                <header onclick="dropdownContent('audCollapse0', 'audArrowDropDown0')">
+                  <strong id="audHeaderGenerar">Audiencia</strong>
+                  <img id="audArrowDropDown0" class="arrow-drop-down-img" src="/sinac-core/static/images/arrow_drop_down.svg" alt="Flecha desplegable" />
+                </header>
+                <div id="audCollapse0" class="accordion-div" style="display: none;">
+                  <div class="dropdown-content">
+                    <div th:insert="~{fragments/crearRequerimientoYAudiencia :: crearRequerimientoYAudiencia('aud', ${audTiposOficiosAndDocumentosToRequerir})}"></div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div id="audNoExisten" th:if="${#lists.isEmpty(audiencias)}">
+            <article>
+              <div class="dropdown-container">El expediente no tiene audiencias.</div>
+            </article>
+          </div>
+          <div th:if="${not #lists.isEmpty(audiencias)}" th:each="audiencia,rowStat : ${audiencias}">
+            <article>
+              <div th:id="|audSection${audiencia?.idExpReq}|" class="dropdown-container">
+                <header th:onclick="dropdownContent('audCollapse' + [[${audiencia?.idExpReq}]], 'audArrowDropDown' + [[${audiencia?.idExpReq}]])">
+                  <strong th:text="|Audiencia ${rowStat.size-rowStat.index}|"></strong>
+                  <img th:id="|audArrowDropDown${audiencia?.idExpReq}|" class="arrow-drop-down-img" src="/sinac-core/static/images/arrow_drop_down.svg" alt="Flecha desplegable" />
+                </header>
+                <div th:id="|audCollapse${audiencia?.idExpReq}|" class="accordion-div" style="display: none;">
+                  <div class="dropdown-content">
+                    <div th:insert="~{fragments/detalleRequerimientoYAudiencia :: cargarRequerimientoYAudiencia('aud', ${audiencia})}"></div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    </dialog>
+  </div>
+</th:block>

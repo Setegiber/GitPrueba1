@@ -1,0 +1,44 @@
+<th:block th:fragment="historicoPlazo">
+  <dialog id="modalHistoricoPlazo">
+    <h5 class="dialog-header">Histórico del Plazo</h5>
+    <div id="modalHistoricoPlazoBody" class="filter-content" style="padding: 1%;">
+      <table id="tableHistoricoPlazo" aria-describedby="Histórico del Plazo del Expediente">
+        <thead>
+          <tr>
+            <th scope="col">Plazo</th>
+            <th scope="col">Estado</th>
+            <th scope="col">F. Inicio</th>
+            <th scope="col">F. Fin Original</th>
+            <th scope="col">F. Fin</th>
+            <th scope="col">F. Inicio Suspensión</th>
+            <th scope="col">F. Fin Suspensión</th>
+            <th scope="col">Suspensión acumulada</th>
+            <th scope="col">Días ampliados</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="plazoExpediente,iterstat : ${historicoPlazoExpediente}">
+            <td th:text="${plazoExpediente?.plazoDto?.nomPlazo != null } ? ${plazoExpediente?.plazoDto?.nomPlazo} : '-'" style="text-align: left;"></td>
+            <td th:text="${plazoExpediente?.ldvMaestraDto?.nomLdvMae != null } ? ${plazoExpediente?.ldvMaestraDto?.nomLdvMae} : '-'" style="text-align: left;"></td>
+            <td th:text="${plazoExpediente?.fechaInicio != null } ? ${#dates.format(plazoExpediente?.fechaInicio, 'dd/MM/yyyy')} : '-'" style="text-align: left;"></td>
+            <td th:text="${plazoExpediente?.fechaFinOrig != null } ? ${#dates.format(plazoExpediente?.fechaFinOrig, 'dd/MM/yyyy')} : '-'" style="text-align: left;"></td>
+            <td th:text="${plazoExpediente?.fechaFin != null } ? ${#dates.format(plazoExpediente?.fechaFin, 'dd/MM/yyyy')} : '-'" style="text-align: left;"></td>
+            <td th:text="${plazoExpediente?.fechaIniSusp != null } ? ${#dates.format(plazoExpediente?.fechaIniSusp, 'dd/MM/yyyy')} : '-'" style="text-align: left;"></td>
+            <td th:text="${plazoExpediente?.fechaFinSusp != null } ? ${#dates.format(plazoExpediente?.fechaFinSusp, 'dd/MM/yyyy')} : '-'" style="text-align: left;"></td>
+            <td th:text="${plazoExpediente?.suspensionAcumulada != null } ? ${plazoExpediente?.suspensionAcumulada} : '-'" style="text-align: left;"></td>
+            <td th:text="${plazoExpediente?.diasAmpliados != null } ? ${plazoExpediente?.diasAmpliados} : '-'" style="text-align: left;"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        <button
+          id="buttonCancelarHistoricoPlazo"
+          name="buttonCancelarHistoricoPlazo"
+          type="button"
+          class="tertiary"
+          value="Cancelar"
+          onclick="cerrarModal('HistoricoPlazo');">Cancelar</button>
+      </div>
+    </div>
+  </dialog>
+</th:block>

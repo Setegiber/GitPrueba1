@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<section name="head" th:insert="~{layout/head (title='SINAC - CIERRE')}">
+
+	<head>
+		<title>SINAC - RECURSOS</title>
+	</head>
+</section>
+
+<body>
+	<div class="d-grid info-container">
+		<main>
+			<input hidden th:value=${modeloTramite.accionesOperaciones}>
+			<form th:action="@{/expedientes/{idExp}/recurso(idExp=${idExp})}" th:object="${modeloTramite}"
+				id="abrirRecursoForm">
+				<div
+					th:if="${modeloTramite.accionesOperaciones.get('CREA')?.get('REC') != null OR modeloTramite.accionesOperaciones.get('CRER')?.get('REC') != null  OR modeloTramite.accionesOperaciones.get('CREJ')?.get('REC') != null
+					OR modeloTramite.accionesOperaciones.get('CRER')?.get('RCD') != null OR modeloTramite.accionesOperaciones.get('CRER')?.get('RCA') != null
+					OR modeloTramite.accionesOperaciones.get('CRER')?.get('SAD') != null}" class="pt-3">
+
+					<button class="tertiary dropdown-toggle" type="button" id="dropdownMenuButton1"
+						data-bs-toggle="dropdown" aria-expanded="false">
+						<svg width="14" height="14" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M4.33325 5.66671H0.333252V4.33337H4.33325V0.333374H5.66658V4.33337H9.66658V5.66671H5.66658V9.66671H4.33325V5.66671Z"
+								fill="#0F5DA3" />
+						</svg>
+						Abrir formulario de recurso
+					</button>
+					<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="dropdown-menu-recurso">
+						<li><button class="tertiary" type="button"
+								th:if="${modeloTramite.accionesOperaciones.get('CREA')?.get('REC')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'RECALZ',${modeloTramite.accionesOperaciones.get('CREA')?.get('REC')},abrirRecursoForm);|">
+								Recurso de alzada</button></li>
+						<li><button class="tertiary" type="button"
+								th:if="${modeloTramite.accionesOperaciones.get('CRER')?.get('REC')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'RECREP',${modeloTramite.accionesOperaciones.get('CRER')?.get('REC')},abrirRecursoForm);|">
+								Recurso de reposición</button>
+						</li>
+						<!-- Contra Archivo -->
+						<li>
+						    <button class="tertiary" type="button"
+						        th:if="${modeloTramite.accionesOperaciones.get('CRER')?.get('RCA')}"
+						        th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'RECREP',${modeloTramite.accionesOperaciones.get('CRER')?.get('RCA')},abrirRecursoForm);|">
+						        Recurso de reposición
+						    </button>
+						</li>
+						<!-- Contra Denegación -->
+						<li>
+							<button class="tertiary" type="button" th:if="${modeloTramite.accionesOperaciones.get('CRER')?.get('RCD')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'RECREP',${modeloTramite.accionesOperaciones.get('CRER')?.get('RCD')},abrirRecursoForm);|">
+								Recurso de reposición
+							</button>
+						</li>
+						<!-- Silencio Administrativo -->
+						<li>
+							<button class="tertiary" type="button" th:if="${modeloTramite.accionesOperaciones.get('CRER')?.get('SAD')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'RECREP',${modeloTramite.accionesOperaciones.get('CRER')?.get('SAD')},abrirRecursoForm);|">
+								Recurso de reposición
+							</button>
+						</li>
+						<li><button class="tertiary" type="button"
+								th:if="${modeloTramite.accionesOperaciones.get('CREJ')?.get('REC')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'RECJUD',${modeloTramite.accionesOperaciones.get('CREJ')?.get('REC')},abrirRecursoForm);|">
+								Recurso Contencioso Administrativo</button>
+						</li>
+					</ul>
+				</div>
+				<div
+					th:if="${modeloTramite.codEstadoExpediente != null && modeloTramite.codEstadoExpediente == 'RECA'}">
+					<p>El expediente tiene un recurso abierto</p>
+				</div>
+			</form>
+			<div id="abrirFormularioRecurso">
+				<th:block th:if="${abrirRecurso}" th:insert="~{fragments/formularioSolicitudRecurso}">
+				</th:block>
+
+			</div>
+		</main>
+		<main>
+			<form th:action="@{/expedientes/{idExp}/recurso(idExp=${idExp})}" th:object="${modeloTramite}"
+				id="abrirRevisionOficioForm">
+				<div
+					th:if="${modeloTramite.accionesOperaciones.get('CROE')?.get('RVO') != null} OR ${modeloTramite.accionesOperaciones.get('CROR')?.get('RVO') != null} OR ${modeloTramite.accionesOperaciones.get('CROI')?.get('RVO')} OR ${modeloTramite.accionesOperaciones.get('CRON')?.get('RVO')} OR ${modeloTramite.accionesOperaciones.get('CROL')?.get('RVO')}" class="pt-3">
+					<button class="tertiary dropdown-toggle" type="button" id="dropdownMenuButton1"
+						data-bs-toggle="dropdown" aria-expanded="false">
+						<svg width="14" height="14" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M4.33325 5.66671H0.333252V4.33337H4.33325V0.333374H5.66658V4.33337H9.66658V5.66671H5.66658V9.66671H4.33325V5.66671Z"
+								fill="#0F5DA3" />
+						</svg>
+						Abrir formulario de revision oficio
+
+					</button>
+					<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton2" id="dropdown-menu-revision">
+						<li><button class="tertiary" type="button"
+								th:if="${modeloTramite.accionesOperaciones.get('CROE')?.get('RVO')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'REVERR',${modeloTramite.accionesOperaciones.get('CROE')?.get('RVO')},abrirRevisionOficioForm,abrirFormularioRecurso)|">
+								Revision Oficio Error</button></li>
+						<li><button class="tertiary" type="button" th:if="${modeloTramite.accionesOperaciones.get('CROR')?.get('RVO')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'REVRVO',${modeloTramite.accionesOperaciones.get('CROR')?.get('RVO')},abrirRevisionOficioForm)|">
+								Revision Oficio Revocación</button>
+						</li>
+						<li><button class="tertiary" type="button" th:if="${modeloTramite.accionesOperaciones.get('CROR')?.get('RVC')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'REVRVO',${modeloTramite.accionesOperaciones.get('CROR')?.get('RVC')},abrirRevisionOficioForm)|">
+								Revision Oficio Revocación</button>
+						</li>
+						<li><button class="tertiary" type="button" th:if="${modeloTramite.accionesOperaciones.get('CROR')?.get('RVD')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'REVRVO',${modeloTramite.accionesOperaciones.get('CROR')?.get('RVD')},abrirRevisionOficioForm)|">
+								Revision Oficio Revocación</button>
+						</li>
+						<li><button class="tertiary" type="button" th:if="${modeloTramite.accionesOperaciones.get('CROR')?.get('RVA')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'REVRVO',${modeloTramite.accionesOperaciones.get('CROR')?.get('RVA')},abrirRevisionOficioForm)|">
+								Revision Oficio Revocación</button>
+						</li>
+
+						<li><button class="tertiary" type="button"
+								th:if="${modeloTramite.accionesOperaciones.get('CROI')?.get('RVO')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'REVINE',${modeloTramite.accionesOperaciones.get('CROI')?.get('RVO')},abrirRevisionOficioForm,abrirFormularioRecurso)|">
+								Revision Oficio Ineficacia</button></li>
+						<li><button class="tertiary" type="button"
+								th:if="${modeloTramite.accionesOperaciones.get('CRON')?.get('RVO')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'REVNUL',${modeloTramite.accionesOperaciones.get('CRON')?.get('RVO')},abrirRevisionOficioForm,abrirFormularioRecurso)|">
+								Revision Oficio Nulidad</button></li>
+						<li><button class="tertiary" type="button"
+								th:if="${modeloTramite.accionesOperaciones.get('CROL')?.get('RVO')}"
+								th:attr="onclick=|abrirFormularioRecursoRevision(${modeloTramite.idExp},'REVLES',${modeloTramite.accionesOperaciones.get('CROL')?.get('RVO')},abrirRevisionOficioForm,abrirFormularioRecurso)|">
+								Revision Oficio Lesividad</button></li>
+					</ul>
+				</div>
+				<div
+					th:if="${modeloTramite.codEstadoExpediente != null && modeloTramite.codEstadoExpediente == 'REVA'}">
+					<p>El expediente tiene una revision de oficio abierta</p>
+				</div>
+			</form>
+			<div id="abrirFormularioRecurso">
+				<th:block th:if="${abrirRecurso}" th:insert="~{fragments/formularioSolicitudRecurso}">
+				</th:block>
+			</div>
+			<div id="abrirFormularioRevisionOficio">
+				<th:block th:if="${abrirRevisionOficio}" th:insert="~{fragments/formularioSolicitudRevOficio}">
+				</th:block>
+			</div>
+		</main>
+	</div>
+</body>
+
+</html>

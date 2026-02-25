@@ -1,0 +1,151 @@
+<th:block th:fragment="adjuntarDocumentos(formularioPadre, documentoAdjuntar)">
+  <h5 class="dialog-header">Adjuntar documento</h5>
+  <span class="d-block p-3">Todos los campos son obligatorios</span>
+  <div class="d-flex flex-column gap-3">
+    <form action="/upload" method="post" enctype="multipart/form-data" id="formAdjuntarDocumento"
+      class="d-grid pt-3 px-3 pb-4 overflow-y-auto">
+      <div>
+        <div th:if="${documentoAdjuntar != null}">
+          <select name="tipoDoc" id="tipoDoc">
+            <option hidden selected value="" th:text="${documentoAdjuntar.nomTipo}"></option>
+            <option th:each="documentoTipo : ${modeloTramite.adjuntarDocumento.listaDocumentoTipoDto}"
+              th:text="${documentoTipo.nomTipo}" th:value="${documentoTipo.idDocTipo}"></option>
+          </select>
+          <label>Tipo de documento</label>
+        </div>
+        <div>
+          <select name="estadoElaboracion" id="estadoElaboracion">
+            <option hidden value=""></option>
+            <option th:each="ldvMaestra : ${modeloTramite.adjuntarDocumento.listaComboLdvMaestraEstadosElaboracionDto}"
+              th:text="${ldvMaestra.nomLdvMae}" th:value="${ldvMaestra.idLdvMae}"></option>
+          </select>
+          <label>Estado de la elaboración</label>
+        </div>
+        <div>
+          <select name="organo" id="organo">
+            <option hidden value=""></option>
+            <option th:each="ldvMaestra : ${modeloTramite.adjuntarDocumento.listaComboLdvOrganoDto}"
+              th:text="${ldvMaestra.nomLdvMae}" th:value="${ldvMaestra.idLdvMae}"></option>
+          </select>
+          <label>Órgano</label>
+        </div>
+        <div>
+          <select name="origen" id="origen">
+            <option hidden value=""></option>
+            <option th:each="ldvMaestra : ${modeloTramite.adjuntarDocumento.listaComboLdvOrigenDto}"
+              th:text="${ldvMaestra.nomLdvMae}" th:value="${ldvMaestra.idLdvMae}"></option>
+          </select>
+          <label>Origen</label>
+        </div>
+      </div>
+      <div>
+        <div th:if="${__${formularioPadre}__ != solicitud}"
+          class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" role="switch" name="generarRegistro" id="generarRegistro">
+          <label class="form-check-label" for="generarRegistro">
+            <span>Generar registro</span>
+          </label>
+        </div>
+        <div th:if="${__${formularioPadre}__ != solicitud}">
+          <input type="text" name="numeroRegistro" id="numeroRegistro" minlength="20" maxlength="20" placeholder="">
+          <label for="numeroRegistro">Número de registro</label>
+        </div>
+        <div th:if="${__${formularioPadre}__ != solicitud}">
+          <input type="date" name="fechaRegistro" id="fechaRegistro" placeholder="">
+          <label for="fechaRegistro">Fecha de presentación</label>
+        </div>
+        <div></div>
+      </div>
+    </form>
+    <section th:if="${documentoAdjuntar == null}" class="d-flex flex-column gap-4 p-3 mx-3">
+      <h6 class="fw-bold">Documento 1</h6>
+      <div>
+        <select name="tipoDoc" id="tipoDoc">
+          <option hidden value=""></option>
+          <option th:each="documentoTipo : ${modeloTramite.adjuntarDocumento.listaDocumentoTipoDto}"
+            th:text="${documentoTipo.nomTipo}" th:value="${documentoTipo.idDocTipo}"></option>
+        </select>
+        <label>Tipo de documento</label>
+      </div>
+      <div class="d-flex flex-column">
+        <div class="d-flex justify-content-between mb-2">
+          <div class="d-flex gap-2 align-items-center">
+            <img th:src="@{/static/images/check_circle-gray.svg}" alt="Pendiente de adjuntar">
+            <strong class="fw-bold">Documento</strong>
+          </div>
+          <label for="documento">
+            <img class="attachment-icon" th:src="@{/static/images/attach_file.svg}" alt="Documento a adjuntar">
+          </label>
+          <input type="file" id="documento" name="documento" accept=".pdf">
+        </div>
+        <div class="field-container--divisor mt-1"></div>
+      </div>
+    </section>
+    <section th:if="${documentoAdjuntar != null}" class="d-flex flex-column px-3">
+      <div class="d-flex gap-2 align-items-center"><img th:src="@{/static/images/check_circle-green.svg}"
+          alt="Documento adjunto">
+        <strong class="fw-bold">Documento</strong>
+      </div>
+      <div class="field-container--divisor mb-2"></div>
+      <div class="tag-container mt-1">
+        <img th:src="@{/static/images/picture_as_pdf.svg}" alt="Documento adjunto">
+        <span th:text="${documentoAdjuntar.nomTipo}"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path
+            d="M9.66671 1.2735L8.72671 0.333496L5.00004 4.06016L1.27337 0.333496L0.333374 1.2735L4.06004 5.00016L0.333374 8.72683L1.27337 9.66683L5.00004 5.94016L8.72671 9.66683L9.66671 8.72683L5.94004 5.00016L9.66671 1.2735Z"
+            fill="#0F5DA3" />
+        </svg>
+      </div>
+    </section>
+    <button th:if="${documentoAdjuntar == null}" class="tertiary ms-3">
+      <svg width="14" height="14" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M4.33325 5.66671H0.333252V4.33337H4.33325V0.333374H5.66658V4.33337H9.66658V5.66671H5.66658V9.66671H4.33325V5.66671Z"
+          fill="#0F5DA3" />
+      </svg>
+      Añadir otros documentos
+    </button>
+    <div class="divTablaDocumentosAdjuntos px-3" th:if="${documentoAdjuntar == null}">
+      <input type="hidden" id="maxDocs" value="15">
+      <table aria-describedby="Tabla de documentos adjuntos" name="tablaDocumentosAdjuntos"
+        id="tablaDocumentosAdjuntos">
+        <thead>
+          <th>Nombre</th>
+          <th>Tipo de documento</th>
+          <th>Origen</th>
+          <th>Estado de elaboración</th>
+          <th>Órgano</th>
+          <th>Generar registro</th>
+          <th>Nº de registro</th>
+          <th>F. de registro</th>
+          <th></th>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div style="display: none;" id="divOculto"></div>
+    <button th:if="${__${formularioPadre}__ == expediente AND documentoAdjuntar == null}" type="button"
+      th:data-parameter1="${__${formularioPadre}__.idExp}"
+      th:onclick="guardarDocumentosAdjuntosExpediente(this.getAttribute('data-parameter1'))"
+      class="primary ms-auto me-3">Guardar
+      documentos</button>
+    <button type="button" th:if="${__${formularioPadre}__ == solicitud AND documentoAdjuntar == null}"
+      th:onclick="guardarDocumentosAdjuntosSolicitud(undefined, undefined, this)" class="primary ms-auto me-3">Guardar
+      documentos</button>
+    <form action="#" id="formularioGuardarDocumentosAdjuntos" name="formularioGuardarDocumentosAdjuntos" method="post">
+    </form>
+    <div>
+      <button id="cerrarAdjuntar" class="tertiary"
+        th:attr="onclick=|cerrarModal('${documentoAdjuntar?.idDocTipo}')|">Cancelar</button>
+      <button type="submit" id="btnAdjuntarDocumento" name="btnAdjuntarDocumento" class="primary"
+        onclick="adjuntarDocumento(this)" th:disabled="${documentoAdjuntar == null}">
+        Adjuntar
+      </button>
+    </div>
+  </div>
+  <script>
+    var input = document.getElementById("fechaRegistro");
+    var fechaActual = new Date().toISOString().split("T")[0];
+    input.setAttribute("max", fechaActual);
+  </script>
+</th:block>

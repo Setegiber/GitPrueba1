@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<section name="head" th:insert="~{layout/head (title='SINAC - Búsqueda de expedientes')}">
+
+	<head>
+		<title>SINAC - Búsqueda de expedientes</title>
+	</head>
+</section>
+
+<body>
+	<th:block th:insert="~{layout/header :: header}"></th:block>
+	<div class="d-grid home-container">
+		<th:block th:insert="~{layout/menu}"></th:block>
+
+		<main class="main-content">
+			<header>
+				<span class="header-title">Búsqueda de Expedientes</span>
+				<button id="mostrarFiltros" class="tertiary"
+					th:classappend="${BusquedaExpedientesDto.idTarjetaInicio != null} ? 'oculto'"
+					onclick="toggleContent({idContenidoAMostrar: 'formBusquedaExpedientes', idContenidoAOcultar: null, idBotonAMostrar: 'ocultarFiltros', idBotonAOcultar: 'mostrarFiltros'})">
+					Mostrar filtros<img th:src="@{/static/images/filter_alt.svg}" alt="Filtros ocultos/mostrados">
+				</button>
+				<button id="ocultarFiltros" class="tertiary"
+					th:classappend="${BusquedaExpedientesDto.idTarjetaInicio == null} ? 'oculto'"
+					onclick="toggleContent({idContenidoAMostrar: null, idContenidoAOcultar: 'formBusquedaExpedientes', idBotonAMostrar: 'mostrarFiltros', idBotonAOcultar: 'ocultarFiltros'})">
+					Ocultar filtros<img th:src="@{/static/images/filter_alt_off.svg}" alt="Filtros ocultos/mostrados">
+				</button>
+			</header>
+			<form id="formBusquedaExpedientes" th:action="@{/expedientes/busqueda}" method="get"
+				class="needs-validation"
+				th:style="${BusquedaExpedientesDto.idTarjetaInicio == null ? 'display: none;' : ''}" novalidate>
+				<input th:id="procedimientoDto.idPro" th:name="procedimientoDto.idPro" hidden
+					th:value="${BusquedaExpedientesDto.procedimientoDto.idPro}" />
+				<input th:id="procedimientoDto.codCorto" th:name="procedimientoDto.codCorto" hidden
+					th:value="${BusquedaExpedientesDto.procedimientoDto.codCorto}" />
+				<section id="busquedaExpedientes" class="card-container">
+					<header>
+						<div class="card-container--left-icon">
+							<img th:src="@{/static/images/search.svg}" alt="Búsqueda de expedientes">
+						</div>
+						<span>Filtrado de Expedientes</span>
+					</header>
+					<div class="d-flex flex-column gap-3">
+						<input hidden th:name="idPro" th:id="idPro"
+							th:value="${BusquedaExpedientesDto.procedimientoDto.idPro}" /> <strong>Filtrar
+							por:</strong>
+						<div class="d-flex gap-3">
+							<div class="dropdown">
+								<div class="tag-container" id="datosIntervinientes" data-bs-toggle="dropdown"
+									aria-expanded="false">
+									Datos de intervinientes
+									<svg width="8" height="4.93" viewBox="0 0 8 4.93" fill="none"
+										xmlns="http://www.w3.org/2000/svg">
+										<path
+											d="M4 5.24998L0 1.24998L0.933333 0.31665L4 3.38332L7.06667 0.31665L8 1.24998L4 5.24998Z"
+											fill="#0F5DA3" />
+									</svg>
+								</div>
+								<ul class="tag-container-list dropdown-menu" aria-labelledby="datosIntervinientes">
+									<li
+                    th:attr="onclick=|mostrarOcultarFiltro('filtroGenerico',${expedientesPage.number},10,'${requestURI}','formBusquedaExpedientes')|">
+                    Datos genéricos</li>
+                  <li
+										th:attr="onclick=|mostrarOcultarFiltro('filtroInteresado',${expedientesPage.number},10,'${requestURI}','formBusquedaExpedientes')|">
+										Interesado</li>
+									<li
+										th:attr="onclick=|mostrarOcultarFiltro('filtroRepUno','${expedientesPage.number}',10,'${requestURI}','formBusquedaExpedientes')|">
+										Representante legal</li>
+									<li
+										th:attr="onclick=|mostrarOcultarFiltro('filtroMandatoPoder','${expedientesPage.number}',10,'${requestURI}','formBusquedaExpedientes')|">
+										Representante voluntario</li>
+								</ul>
+							</div>
+							<div class="dropdown">
+								<div class="tag-container" id="datosExpediente" data-bs-toggle="dropdown"
+									aria-expanded="false">
+									Datos de expediente
+									<svg width="8" height="4.93" viewBox="0 0 8 4.93" fill="none"
+										xmlns="http://www.w3.org/2000/svg">
+										<path
+											d="M4 5.24998L0 1.24998L0.933333 0.31665L4 3.38332L7.06667 0.31665L8 1.24998L4 5.24998Z"
+											fill="#0F5DA3" />
+									</svg>
+								</div>
+								<ul class="tag-container-list dropdown-menu" aria-labelledby="datosExpediente">
+									<li
+										th:attr="onclick=|mostrarOcultarFiltro('filtroDatosGenerales','${expedientesPage.number}',10,'${requestURI}','formBusquedaExpedientes')|">
+										Datos generales</li>
+									<li
+										th:attr="onclick=|mostrarOcultarFiltro('filtroSituacionExpediente',${expedientesPage.number},10,'${requestURI}','formBusquedaExpedientes')|">
+										Situación expediente</li>
+									<li
+										th:attr="onclick=|mostrarOcultarFiltro('filtroDatosSolicitud','${expedientesPage.number}',10,'${requestURI}','formBusquedaExpedientes')|">
+										Datos solicitud</li>
+
+								</ul>
+							</div>
+							<div th:if="${!@componentesComunesService.getFormularioCamposValidaListaSinExpedienteByIdProcedimiento(BusquedaExpedientesDto.procedimientoDto.idPro).isEmpty()}"
+								class="tag-container"
+								th:attr="onclick=|mostrarOcultarFiltro('filtroProcedimiento','${expedientesPage.number}',10,'${requestURI}','formBusquedaExpedientes')|">
+								Datos de procedimiento</div>
+							<div class="tag-container"
+								th:attr="onclick=|mostrarOcultarFiltro('filtroDatosDocumentacion','${expedientesPage.number}',10,'${requestURI}','formBusquedaExpedientes')|">
+								Datos de documentación</div>
+							<div class="tag-container"
+								th:if="${BusquedaExpedientesDto.procedimientoDto.codCorto != 'DR'}"
+								th:attr="onclick=|mostrarOcultarFiltro('filtroNotificacion','${expedientesPage.number}',10,'${requestURI}','formBusquedaExpedientes')|">
+								Datos de notificación</div>
+						</div>
+						<div id="filtroAsignacion">
+							<div class="form-check form-switch">
+								<input class="form-check-input" type="checkbox" role="switch" 
+									th:value="${BusquedaExpedientesDto.filtroAsignacion}"
+									id="checkMisExpedientes" name="filtroAsignacion"
+									>
+								<label class="form-check-label">
+									<span>Mis expedientes asociados</span>
+								</label>
+							</div>
+						</div>
+					</div>
+					<div id="filtro"><!-- th:class="${BusquedaExpedientesDto.idTarjetaInicio == null} ? 'oculto'"-->
+						<div id="filtroGenerico">
+              <div th:if="${BusquedaExpedientesDto.filtroGenerico}" class="filter-content">
+                <div>
+                  <strong>Datos de intervinientes: Datos genéricos </strong> <img
+                    onclick="limpiarFiltroConcreto('filtroGenerico'); $(this).parent().parent().parent().hide();"
+                    th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+                </div>
+                <div class="info-container">
+                  <div id="tieneRepreL">
+                      <select class="form-control" id="tieneRepresentanteLegal" th:field="${BusquedaExpedientesDto.tieneRepresentanteLegal}">
+                        <option selected value=""></option>
+                        <option value="No">No</option>
+                        <option value="Si">Si</option>
+                      </select>
+                      <label>Representante Legal</label>
+                  </div>
+                
+                  <div id="tieneRepreV">
+                    <select class="form-control" id="tieneRepresentanteVoluntario" th:field="${BusquedaExpedientesDto.tieneRepresentanteVoluntario}">
+                      <option selected value=""></option>
+                      <option value="No">No</option>
+                      <option value="Si">Si</option>
+                    </select>
+                    <label>Representante Voluntario</label>
+                  </div>
+</div>
+              </div>
+            </div>
+            <div id="filtroInteresado">
+							<div th:if="${BusquedaExpedientesDto.filtroInteresado}" class="filter-content">
+								<div>
+									<strong>Datos de intervinientes: Interesado</strong> <img
+										onclick="limpiarFiltroConcreto('filtroInteresado'); $(this).parent().parent().parent().hide();"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<th:block
+									th:insert="~{fragments/filtro/datosPersona :: persona('interesado','identificacionInteresado','contactoInteresado','domicilioInteresado','BusquedaExpedientesDto')}">
+								</th:block>
+							</div>
+						</div>
+						<div id="filtroRepUno">
+							<div th:if="${BusquedaExpedientesDto.filtroRepUno}" class="filter-content">
+								<div>
+									<strong>Datos de intervinientes: Representante legal </strong>
+									<img onclick="limpiarFiltroConcreto('filtroRepUno'); $(this).parent().parent().parent().hide(); $('#filtroRepDos').hide(); $('#anyadirRep').show();"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<th:block
+									th:insert="~{fragments/filtro/datosPersona :: persona('representante1', 'identificacionRepresentanteUno','contactoRepresentanteUno','domicilioRepresentanteUno','BusquedaExpedientesDto')}">
+								</th:block>
+								<div class="d-flex justify-content-between mt-3">
+									<button type="button" onclick="$('#filtroRepDos').show(); $(this).hide();"
+										class="tertiary" id="anyadirRep">
+										<svg width="14" height="14" viewBox="0 0 10 10" fill="none"
+											xmlns="http://www.w3.org/2000/svg">
+											<path
+												d="M4.33325 5.66671H0.333252V4.33337H4.33325V0.333374H5.66658V4.33337H9.66658V5.66671H5.66658V9.66671H4.33325V5.66671Z"
+												fill="#0F5DA3" />
+										</svg>
+										Añadir representante legal
+									</button>
+								</div>
+							</div>
+						</div>
+						<div id="filtroRepDos" style="display: none">
+							<div class="filter-content">
+								<div>
+									<strong>Datos de intervinientes: Representante legal </strong>
+									<img onclick="limpiarFiltroConcreto('filtroRepDos'); $(this).parent().parent().parent().hide(); $('#anyadirRep').show();"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<th:block
+									th:insert="~{fragments/filtro/datosPersona :: persona('representante2','identificacionRepresentanteDos','contactoRepresentanteDos', 'domicilioRepresentanteDos','BusquedaExpedientesDto')}">
+								</th:block>
+							</div>
+						</div>
+						<div id="filtroMandatoPoder">
+							<div th:if="${BusquedaExpedientesDto.filtroMandatoPoder}" class="filter-content">
+								<div>
+									<strong>Datos de intervinientes: Representante voluntario</strong> <img
+										onclick="limpiarFiltroConcreto('filtroMandatoPoder'); $(this).parent().parent().parent().hide()"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<th:block
+									th:insert="~{fragments/filtro/datosPersona :: persona('representanteMandato','identificacionMandatoPoder','contactoRepresentanteMandatoPoder','domicilioRepresentanteMandatoPoder','BusquedaExpedientesDto')}">
+								</th:block>
+							</div>
+						</div>
+						<div id="filtroDatosGenerales">
+							<div th:if="${BusquedaExpedientesDto.filtroDatosGenerales}" class="filter-content">
+								<div>
+									<strong>Datos generales</strong> <img
+										onclick="limpiarFiltroConcreto('filtroDatosGenerales'); $(this).parent().parent().parent().hide()"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<div class="info-container">
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.codExp}" th:maxlength="50"
+											placeholder=""> <label>Código de expediente</label>
+									</div>
+									<div>
+										<input class="form-control" type="date"
+											th:field="${BusquedaExpedientesDto.fechaEfectosDesde}"
+											th:attr="min=${#dates.format(#dates.create(1900,01,01), 'yyyy-MM-dd')}, max=${#dates.format(#dates.create(3000,12,31), 'yyyy-MM-dd')}">
+										<label>Fecha de presentación desde</label>
+									</div>
+									<div>
+										<input class="form-control" type="date"
+											th:field="${BusquedaExpedientesDto.fechaEfectosHasta}"
+											th:attr="max=${#dates.format(#dates.create(3000,12,31), 'yyyy-MM-dd')}">
+										<label>Fecha de presentación hasta</label>
+									</div>
+									<div>
+										<input class="form-control" type="date"
+											th:field="${BusquedaExpedientesDto.fechaResolucionDesde}"
+											th:attr="min=${#dates.format(#dates.create(1900,01,01), 'yyyy-MM-dd')}, max=${#dates.format(#dates.create(3000,12,31), 'yyyy-MM-dd')}">
+										<label>Fecha de resolución desde</label>
+									</div>
+									<div>
+										<input class="form-control" type="date"
+											th:field="${BusquedaExpedientesDto.fechaResolucionHasta}"
+											th:attr="max=${#dates.format(#dates.create(3000,12,31), 'yyyy-MM-dd')}">
+										<label>Fecha de resolución hasta</label>
+									</div>
+                  <div>
+                    <select class="form-control"
+                      th:field="${BusquedaExpedientesDto.origenExpediente.idCampoDesplegable}">
+                      <option  value="0"></option>
+                      <option
+                        th:each="origExpediente : ${@componentesComunesService.getComboDtoByCodLdvEntidadMaestra('ORI_SOL')}"
+                        th:text="${origExpediente.valorCampoDesplegable}"
+                        th:value="${origExpediente.idCampoDesplegable}" />
+                    </select> <label>Origen Expediente</label>
+                  </div>
+
+								</div>
+							</div>
+						</div>
+						<div id="filtroSituacionExpediente">
+							<div th:if="${BusquedaExpedientesDto.filtroSituacionExpediente}" class="filter-content">
+								<div>
+									<strong>Situación expediente</strong> <img
+										onclick="limpiarFiltroConcreto('filtroSituacionExpediente'); $(this).parent().parent().parent().hide()"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<div id="actualizarTamiteEstado" class="info-container">
+									<div>
+										<select id="select-fase" class="form-control"
+											th:field="${BusquedaExpedientesDto.idFase}"
+											th:attr="onchange=|parameterMap.set('actualizarEstado','faseChange');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('actualizarTamiteEstado'),true)|">
+											<option selected value=""></option>
+											<option
+												th:each="fase : ${@componentesComunesService.getListaFasesDtoByProcId(BusquedaExpedientesDto.procedimientoDto.idPro)}"
+												th:text="${fase.nomFase}" th:value="${fase.idFase}">
+										</select> <label>Fase</label>
+									</div>
+									<div>
+										<select id="select-tramite" class="form-control"
+											th:field="${BusquedaExpedientesDto.idTramite}"
+											th:attr="onchange=|parameterMap.set('actualizarEstado','tramiteChange');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('actualizarTamiteEstado'),true)|">
+											<option selected value=""></option>
+											<option
+												th:each="tramite : ${@componentesComunesService.getListaTramiteDtoByProcId(BusquedaExpedientesDto.procedimientoDto.idPro,BusquedaExpedientesDto.idFase)}"
+												th:text="${tramite.nomTramite}" th:value="${tramite.idTramite}">
+										</select> <label>Tramite</label>
+									</div>
+									<div>
+										<select class="form-control" th:field="${BusquedaExpedientesDto.idEstado}">
+											<option selected value=""></option>
+											<option
+												th:each="estado : ${@componentesComunesService.getListaMaquinaEstadosDtoByProcIdFaseIdTramiteId(BusquedaExpedientesDto.procedimientoDto.idPro,BusquedaExpedientesDto.idFase,BusquedaExpedientesDto.idTramite)}"
+												th:text="${estado.nomEstado}" th:value="${estado.idEstado}">
+										</select> <label>Estado expediente</label>
+									</div>
+									<div>
+										<select class="form-control"
+											th:field="${BusquedaExpedientesDto.sentidoResolucion.idCampoDesplegable}">
+											<option value="0"></option>
+											<option
+												th:each="sentResolucion : ${@componentesComunesService.getComboDtoByCodLdvEntidadMaestra('SENT_RES')}"
+												th:text="${sentResolucion.valorCampoDesplegable}"
+												th:value="${sentResolucion.idCampoDesplegable}" />
+										</select> <label>Sentido Resolución</label>
+									</div>
+
+									<div>
+										<select class="form-control"
+											th:field="${BusquedaExpedientesDto.requerimientoFlgActivo}">
+											<option selected value=""></option>
+											<option value="true">Sí</option>
+										</select> <label>En requerimiento</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="filtroDatosSolicitud">
+							<div th:if="${BusquedaExpedientesDto.filtroDatosSolicitud}" class="filter-content">
+								<div>
+									<strong>Datos de solicitud</strong> <img
+										onclick="limpiarFiltroConcreto('filtroDatosSolicitud'); $(this).parent().parent().parent().hide()"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+
+								<div class="info-container">
+									<div>
+										<select multiple="" class="form-control selected" id="motivoSolicitud"
+											th:field="${BusquedaExpedientesDto.listaMotivosSolicitud}"
+											onchange="manejarComboMotivo(motivoSolicitud, otroMotivoSolicitud)"
+											name="motivoSolicitud.idLdvMae" style="height: 100px !important;">
+											<option selected value=""></option>
+											<option
+												th:each="solicitud : ${@componentesComunesService.getComboMotivoSolicitud(BusquedaExpedientesDto.procedimientoDto.codCorto)}"
+												th:text="${solicitud.valorCampoDesplegable}"
+												th:value="${solicitud.idCampoDesplegable}">
+										</select> <label
+											style="top: -10px !important; left: 12px; background-color: #fafafa; color: #0f5da3; padding: 0px 4px;">Motivo</label>
+									</div>
+
+									<div style="display: none;">
+										<input class="form-control" id="otroMotivoSolicitud" type="text"
+											th:field="${BusquedaExpedientesDto.motivoSolicitudOtros}" th:maxlength="50"
+											placeholder=""> <label>Otro
+											motivo</label>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="filtroProcedimiento"
+							th:if="${!@componentesComunesService.getFormularioCamposValidaListaSinExpedienteByIdProcedimiento(BusquedaExpedientesDto.procedimientoDto.idPro).isEmpty()}">
+							<div th:if="${BusquedaExpedientesDto.filtroProcedimiento}" class="filter-content">
+								<div>
+									<strong>Datos de procedimiento</strong> <img
+										onclick="limpiarFiltroConcreto('filtroProcedimiento'); $(this).parent().parent().parent().hide()"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<div class="info-container">
+									<th:block
+										th:each="formulario : ${@componentesComunesService.getListaFormularioCamposValidaByIdProcedimientoFlgExpediente(BusquedaExpedientesDto.procedimientoDto.idPro,null)}">
+										<th:block th:insert="~{fragments/camposEspecificos :: camposEspecificosBusqueda}">
+										</th:block>
+									</th:block>
+								</div>
+							</div>
+						</div>
+						<div id="filtroDatosDocumentacion">
+							<div th:if="${BusquedaExpedientesDto.filtroDatosDocumentacion}" class="filter-content">
+								<div>
+									<strong>Datos de documentación</strong> <img
+										onclick="limpiarFiltroConcreto('filtroDatosDocumentacion'); $(this).parent().parent().parent().hide()"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<div id="selectTipoEstadoDocu" class="info-container">
+									<div>
+										<select th:field="${BusquedaExpedientesDto.tipoDocumentoDto.idDocTipo}"
+											class="form-control">
+											<option value="0" th:selected="selected"></option>
+											<option
+												th:each="documentoTipo : ${@componentesComunesService.getListaDocumentoTipoDtoByProcId(1)}"
+												th:text="${documentoTipo.nomTipo}"
+												th:value="${documentoTipo.idDocTipo}" />
+										</select> <label>Tipo de documento:</label>
+									</div>
+									<div>
+										<select
+											th:field="${BusquedaExpedientesDto.estadoDocumentoDto.idCampoDesplegable}"
+											class="form-control">
+											<option value="0" th:selected="selected"></option>
+											<option
+												th:each="estadoDoc : ${@componentesComunesService.getComboDtoByCodLdvEntidadMaestra('EST_DOC')}"
+												th:text="${estadoDoc.valorCampoDesplegable}"
+												th:value="${estadoDoc.idCampoDesplegable}" />
+										</select> <label>Estado documento:</label>
+									</div>
+								</div>
+								<div>
+									<div id="tablaTipoEstadoDocu">
+										<div th:if="${#lists.isEmpty(BusquedaExpedientesDto.listaTipoDocumentoEstadoDocumento)}"
+											class="row">
+											<div class="col-sm-6">
+												<button type="button" class="primary"
+													th:attr="onclick=|if(checkFiltroDatosDocumentacion()){ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('selectTipoEstadoDocu','tablaTipoEstadoDocu'),true);}|">Añadir
+													documento</button>
+											</div>
+										</div>
+										<br />
+										<div
+											th:if="${not #lists.isEmpty(BusquedaExpedientesDto.listaTipoDocumentoEstadoDocumento)}">
+											<div class="card-container">
+												<div class="d-flex justify-content-between">
+													<button type="button" class="primary"
+														th:attr="onclick=|if(checkFiltroDatosDocumentacion()){ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('selectTipoEstadoDocu','tablaTipoEstadoDocu'),true);}|">Añadir
+														documento</button>
+													<h6>Lista Tipo documento - Estado documento</h6>
+												</div>
+												<table aria-describedby="Lista Tipo documento - Estado documento"
+													class="table table-striped">
+													<thead>
+														<th style="width: 40%;">Tipo de documento</th>
+														<th style="width: 40%;">Estado del documento</th>
+														<th></th>
+													</thead>
+													<tbody>
+														<tr
+															th:each="tipoEstadoDocumento,rowStat :${BusquedaExpedientesDto.listaTipoDocumentoEstadoDocumento}">
+															<td>
+																<p
+																	th:text="${tipoEstadoDocumento.tipoDocumento.nomTipo}">
+																</p> <input type="hidden"
+																	th:value="${tipoEstadoDocumento.tipoDocumento.idDocTipo}"
+																	th:field="${BusquedaExpedientesDto.listaTipoDocumentoEstadoDocumento[__${rowStat.index}__].tipoDocumento.idDocTipo}" />
+																<input type="hidden"
+																	th:value="${tipoEstadoDocumento.tipoDocumento.idDocTipo}"
+																	th:field="${BusquedaExpedientesDto.listaTipoDocumentoEstadoDocumento[__${rowStat.index}__].tipoDocumento.nomTipo}" />
+															</td>
+															<td>
+																<p
+																	th:text="${tipoEstadoDocumento.estadoDocumento.valorCampoDesplegable}">
+																</p> <input type="hidden"
+																	th:value="${tipoEstadoDocumento.estadoDocumento.valorCampoDesplegable}"
+																	th:field="${BusquedaExpedientesDto.listaTipoDocumentoEstadoDocumento[__${rowStat.index}__].estadoDocumento.valorCampoDesplegable}" />
+																<input type="hidden"
+																	th:value="${tipoEstadoDocumento.estadoDocumento}"
+																	th:field="${BusquedaExpedientesDto.listaTipoDocumentoEstadoDocumento[__${rowStat.index}__].estadoDocumento.idCampoDesplegable}" />
+															</td>
+															<td>
+																<button type="button"
+																	th:attr="onclick=|parameterMap.set('removeTipoEstado',${rowStat.index});ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('selectTipoEstadoDocu','tablaTipoEstadoDocu'),true);|"
+																	class=" btn secondary">Borrar</button>
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="filtroNotificacion"
+							th:if="${BusquedaExpedientesDto.procedimientoDto.codCorto != 'DR'}">
+							<div th:if="${BusquedaExpedientesDto.filtroNotificacion}" class="filter-content">
+								<div>
+									<strong>Datos de notificación</strong> <img
+										onclick="limpiarFiltroConcreto('filtroNotificacion'); $(this).parent().parent().parent().hide()"
+										th:src="@{/static/images/icon.svg}" alt="Cierre de datos">
+								</div>
+								<div class="info-container">
+									<div>
+										<input class="form-control" type="tel"
+											th:field="${BusquedaExpedientesDto.personaContactoElectronico.telFijo}"
+											maxlength="20" placeholder="" pattern="^(?:[0-9+]+(?:\s[0-9+]+)*)?(?<!\s)$">
+										<label>Teléfono fijo</label>
+									</div>
+									<div>
+										<input class="form-control" type="tel"
+											th:field="${BusquedaExpedientesDto.personaContactoElectronico.telMovil}"
+											maxlength="20" placeholder="" pattern="^(?:[0-9+]+(?:\s[0-9+]+)*)?(?<!\s)$">
+										<label>Teléfono móvil</label>
+									</div>
+									<div>
+										<input class="form-control" type="email"
+											th:field="${BusquedaExpedientesDto.personaContactoElectronico.email}"
+											maxlength="100" placeholder=""
+											pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}">
+										<label>Correo electrónico</label>
+									</div>
+									<div>
+										<select class="form-control"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.tipoVia.idTipoVia}">
+											<option selected value=""></option>
+											<option th:each="estado : ${@componentesComunesService.getComboTiposVia()}"
+												th:text="${estado.valorCampoDesplegable}"
+												th:value="${estado.idCampoDesplegable}">
+										</select>
+										<label>Tipo de vía</label>
+									</div>
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.nomVia}"
+											maxlength="50" placeholder=""
+											pattern="^(?:[a-zA-ZáéíóúüñÑÁÉÍÓÚÜÇç]+(?:\s[a-zA-ZáéíóúüñÑÁÉÍÓÚÜÇç]+)*)?(?<!\s)$">
+										<label>Nombre de vía</label>
+									</div>
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.numVia}"
+											maxlength="5" pattern="^(?:[0-9]+)?$" placeholder="">
+										<label>Nº</label>
+									</div>
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.bloque}"
+											maxlength="3" pattern="^(?:[a-zA-Z]+)?$" placeholder="">
+										<label>Bloque</label>
+									</div>
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.portal}"
+											maxlength="3" pattern="^(?:[a-zA-Z0-9]+)?$" placeholder="">
+										<label>Portal</label>
+									</div>
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.piso}" maxlength="3"
+											pattern="^(?:[0-9]+)?$" placeholder="">
+										<label>Piso</label>
+									</div>
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.escalera}"
+											maxlength="3" pattern="^(?:[a-zA-Z0-9]+)?$" placeholder="">
+										<label>Escalera</label>
+									</div>
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.letra}" maxlength="3"
+											pattern="^(?:[a-zA-Z0-9]+)?$" placeholder="">
+										<label>Letra</label>
+									</div>
+									<div>
+										<input class="form-control" type="text"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.km}" maxlength="5"
+											pattern="^(?:[0-9]+)?$" placeholder="">
+										<label>Km</label>
+									</div>
+									<div id="paisNotificacion">
+										<select class="form-control" id="pais"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.paisDto.idPais}"
+											th:attr="onchange=|manejarComboPais($(this),$('#provinciaNotificacion'),$('#municipioNotificacion'),'${url}')|">
+											<option selected value=""></option>
+											<option
+												th:each="tipoIdentificacion : ${@componentesComunesService.getComboPaises()}"
+												th:text="${tipoIdentificacion.valorCampoDesplegable}"
+												th:value="${tipoIdentificacion.idCampoDesplegable}">
+										</select>
+										<label>País</label>
+									</div>
+									<div id="provinciaNotificacion"
+										th:classappend="${BusquedaExpedientesDto.domicilioNoficacion.paisDto.nomPais !='ESPAÑA'} ? 'oculto'">
+										<select class="form-control" id="provincia"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.provinciaDto.idProvincia}">
+											<option selected value=""></option>
+											<option
+												th:each="tipoIdentificacion : ${@componentesComunesService.getComboProvincias()}"
+												th:text="${tipoIdentificacion.valorCampoDesplegable}"
+												th:value="${tipoIdentificacion.idCampoDesplegable}">
+										</select>
+										<label>Provincia</label>
+									</div>
+									<div id="municipioNotificacion"
+										th:classappend="${BusquedaExpedientesDto.domicilioNoficacion.paisDto.nomPais !='ESPAÑA'} ? 'oculto'">
+										<select class="form-control" id="municipio"
+											th:field="${BusquedaExpedientesDto.domicilioNoficacion.localidadDto.idMunicipio}">
+											<option selected value=""></option>
+											<option
+												th:each="tipoIdentificacion : ${@componentesComunesService.getComboLocalidades()}"
+												th:text="${tipoIdentificacion.valorCampoDesplegable}"
+												th:value="${tipoIdentificacion.idCampoDesplegable}">
+										</select>
+										<label>Localidad</label>
+									</div>
+                  <div id="tipoNotificacion">
+                    <select class="form-control" id="tiponoti" th:field="${BusquedaExpedientesDto.flgConsiente}">
+                      <option selected value=""></option>
+                      <option value="false">Postal</option>
+                      <option value="true">Telemática</option>
+                    </select>
+                    <label>Tipo de notificación</label>
+                  </div>
+                  <div id="tipoDomicilio">
+                    <select class="form-control" id="tipodomicilio" th:field="${BusquedaExpedientesDto.tipoDomicilio}">
+                      <option selected value=""></option>
+                      <option value="nacional">Nacional</option>
+                      <option value="extranjero">Internacional</option>
+                    </select>
+                    <label>Tipo de dirección</label>
+                  </div>
+								</div>
+							</div>
+						</div>
+						<div class="d-flex justify-content-between mt-3">
+							<button onclick="limpiarFiltros()" type="button" class="tertiary">
+								Limpiar todos los filtros <img th:src="@{/static/images/delete.svg}"
+									alt="Eliminación de filtros">
+							</button>
+							<button class="primary" id="busquedaExpedientes" type="button"
+								th:attr="onclick=|obtenerCheckFormulario('formBusquedaExpedientes');validarBusquedaExpedientes('${url}/expedientes/busqueda');|">Buscar</button>
+						</div>
+					</div>
+				</section>
+			</form>
+			<section id="resultadoBusqueda" class="card-container">
+				<div class="d-flex justify-content-between">
+					<span class="mt-2" th:text="${expedientesPage.totalElements} + ' resultados encontrados'"></span>
+					<button class="secondary" type="button" th:attr="onclick=|exportarExcelV2()|">Generar Excel<img th:src="@{/static/images/Vector.svg}" 
+					 alt="Generación de Excel"></button>
+				</div>
+				<table aria-describedby="Tabla de expedientes" id="TablaExpedientes">
+					<thead>
+						<tr>
+							<th></th>
+							<th scope="col" id="columnaExpediente">
+								<div class="d-flex align-items-center col-md-6 input-group">
+									<span>Expediente</span>
+									<button type="button" id="botonOrdenarNeutroExpediente"
+										th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'codExpediente') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'codExpediente' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','codExpediente');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+									</button>
+									<button type="button" id="botonOrdenarAscendenteExpediente"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda=='codExpediente'} and ${BusquedaExpedientesDto.tipoOrdenacionBusqueda=='ascendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','codExpediente');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+											alt="Ordenación Ascendente">
+									</button>
+									<button type="button" id="botonOrdenarDescendenteExpediente"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda=='codExpediente'} and ${BusquedaExpedientesDto.tipoOrdenacionBusqueda=='descendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+											alt="Ordenación Descendente">
+									</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaNumIdentificacion">
+								<div class="d-flex align-items-center col-md-6 input-group">
+									<span>Nº Identificación </span>
+									<button type="button" id="botonOrdenarNeutroNIden"
+										th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'numIdentificacion') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'numIdentificacion' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','numIdentificacion');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+									</button>
+									<button type="button" id="botonOrdenarAscendenteNIden"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'numIdentificacion' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','numIdentificacion');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+											alt="Ordenación Ascendente">
+									</button>
+									<button type="button" id="botonOrdenarDescendenteNIden"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'numIdentificacion' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+											alt="Ordenación Descendente">
+									</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaEstado">
+								<div class="d-flex align-items-center col-md-6 input-group">
+									<span>Estado</span>
+									<button type="button" id="botonOrdenarNeutroEstado"
+										th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'estado') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'estado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','estado');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+									</button>
+									<button type="button" id="botonOrdenarAscendenteEstado"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'estado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','estado');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+											alt="Ordenación Ascendente">
+									</button>
+									<button type="button" id="botonOrdenarDescendenteEstado"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'estado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+											alt="Ordenación Descendente">
+									</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaNombre">
+								<div class="d-flex align-items-center col-md-6 input-group">
+									<span>Nombre</span>
+									<button type="button" id="botonOrdenarNeutroNom"
+										th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'nombreInteresado') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nombreInteresado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','nombreInteresado');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+									</button>
+									<button type="button" id="botonOrdenarAscendenteNom"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nombreInteresado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','nombreInteresado');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+											alt="Ordenación Ascendente">
+									</button>
+									<button type="button" id="botonOrdenarDescendenteNom"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'nombreInteresado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+											alt="Ordenación Descendente">
+									</button>
+								</div>
+							</th>
+							<th scope="col">
+								<div class="d-flex align-items-center col-md-6 input-group">
+									<span>Apellido 1</span>
+									<button type="button" id="botonOrdenarNeutroApe1"
+										th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'apellido1Interesado') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido1Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','apellido1Interesado');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+									</button>
+									<button type="button" id="botonOrdenarAscendenteApe1"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido1Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','apellido1Interesado');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+											alt="Ordenación Ascendente">
+									</button>
+									<button type="button" id="botonOrdenarDescendenteApe1"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido1Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+											alt="Ordenación Descendente">
+									</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaApellido2">
+								<div class="d-flex align-items-center col-md-6 input-group">
+									<span>Apellido 2</span>
+									<button type="button" id="botonOrdenarNeutroApe2"
+										th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'apellido2Interesado') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido2Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','apellido2Interesado');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+									</button>
+									<button type="button" id="botonOrdenarAscendenteApe2"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido2Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','apellido2Interesado');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+											alt="Ordenación Ascendente">
+									</button>
+									<button type="button" id="botonOrdenarDescendenteApe2"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'apellido2Interesado' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+											alt="Ordenación Descendente">
+									</button>
+								</div>
+							</th>
+							<th scope="col" id="columnaFechaEfecto">
+								<div class="d-flex align-items-center col-md-6 input-group">
+									<span>Fecha de presentación</span>
+									<button type="button" id="botonOrdenarNeutroFCreacion"
+										th:if="${(BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == null and BusquedaExpedientesDto.tipoOrdenacionBusqueda == null) or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda != 'fechaEfectos') or (BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'fechaEfectos' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'neutral') }"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','ascendente');parameterMap.set('nombreColumnaOrdenarBusqueda','fechaEfectos');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/swap_vert.svg}" alt="Ordenación">
+									</button>
+									<button type="button" id="botonOrdenarAscendenteFCreacion"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'fechaEfectos' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'ascendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','descendente');parameterMap.set('nombreColumnaOrdenarBusqueda','fechaEfectos');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_upward-14-blue.svg}"
+											alt="Ordenación Ascendente">
+									</button>
+									<button type="button" id="botonOrdenarDescendenteFCreacion"
+										th:if="${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda == 'fechaEfectos' and BusquedaExpedientesDto.tipoOrdenacionBusqueda == 'descendente'}"
+										th:attr="onclick=|parameterMap.set('page',${expedientesPage.number});parameterMap.set('size',$('#tableSizeMostrar').find(':selected').val());parameterMap.set('tipoOrdenacionBusqueda','neutral');ajaxLoadForm('${url}/expedientes/busqueda', 'POST', 'formBusquedaExpedientes', new Array('resultadoBusqueda'), true)|"
+										class="tertiary btn p-0 ms-1">
+										<img th:src="@{/static/images/arrow_downward-14-blue.svg}"
+											alt="Ordenación Descendente">
+									</button>
+								</div>
+							</th>
+						</tr>
+					</thead>
+					<tbody id="contenidoTablaExpedientes">
+						<tr class="select-row" th:each="tablaExps : ${expedientesPage.content}"
+							th:attr="onclick=|window.location.href='${url}/expedientes/${tablaExps.idExp}/tramite/REV/'|">
+							<td>
+								<div class="icon-wrapper-avisos" th:if="${!#lists.isEmpty(tablaExps.listaAvisos)}">
+									<!-- Ícono de la campana -->
+									<img th:src="@{/static/images/notifications-24-blue.svg}" alt="Avisos">
+									<!-- Círculo rojo de notificación -->
+									<div class="notification-badge"
+										th:text="${#lists.size(tablaExps.listaAvisos)}">
+									</div>
+									<!-- Bocadillo de notificaciones -->
+									<div class="tooltip-avisos" th:if="${tablaExps.listaAvisos != null and !#lists.isEmpty(tablaExps.listaAvisos)}">
+										<span th:each="aviso, iterStat : ${tablaExps.listaAvisos}"
+											th:text="${aviso} + ${iterStat.index < tablaExps.listaAvisos.size() - 1 ? ', ' : ''}">
+										</span>
+									</div>
+									</div>
+							</td>
+							<td th:text="${tablaExps.codExp}"></td>
+							<td th:text="${tablaExps.numAcreditacionInteresado}"></td>
+							<td><span th:if="${#lists.size(tablaExps.listaEstados)==0}"
+									th:text="${tablaExps.estadoExpediente}" class="tag-container" id="info"></span>
+								<span th:if="${#lists.size(tablaExps.listaEstados)>0}" th:inline="text"
+									class="tag-container" id="info"> <span th:text="${tablaExps.estadoExpediente}"
+										th:remove="tag"></span>
+									<span data-bs-toggle="tooltip" data-bs-placement="top"
+										th:data-bs-title="${#strings.arrayJoin(tablaExps.listaEstados, ' , ')}"
+										th:text="'+'+${#lists.size(tablaExps.listaEstados)}"
+										class="badge text-bg-secondary"></span>
+								</span>
+							</td>
+							<td th:text="${tablaExps.nombreInteresado}"></td>
+							<td th:text="${tablaExps.apellido1Interesado}"></td>
+							<td th:text="${tablaExps.apellido2Interesado}"></td>
+							<td th:text="${#dates.format(tablaExps.fechaEfectos, 'dd/MM/yyyy')}"></td>
+						</tr>
+					</tbody>
+				</table>
+				<th:block
+					th:replace="~{layout/paginador :: paginador(${expedientesPage},'formBusquedaExpedientes','busquedaExpedientes','resultadoBusqueda', ${BusquedaExpedientesDto.nombreColumnaOrdenarBusqueda}, ${BusquedaExpedientesDto.tipoOrdenacionBusqueda},'page',${pageNumbers})}">
+				</th:block>
+			</section>
+		</main>
+	</div>
+	<section name="footer" th:insert="~{layout/footer}"></section>
+</body>
+
+</html>

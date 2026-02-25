@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Fragmento adjuntar documentos</title>
+</head>
+<body>
+	<th:block th:fragment="adjuntarDocumentos(formularioPadre, procedimiento, entrada)">
+		<h5 class="dialog-header" th:text="#{adjuntar.documento}"></h5>
+		<div name="tablaDocumentos" class="filter-content"
+			style="padding: 1%;" id="tablaAdjuntarDocumentos">
+			<form
+			th:action="@{/expedientes/{idExp}/tramite/REV/documentos}" enctype="multipart/form-data"
+			name="adjuntar" id="adjuntarDoc" method="post">
+			<div>
+				<p>Los campos marcados con (*) son obligatorios</p>
+			</div>
+				<div class="d-flex flex-column gap-4">
+					<div class="d-flex gap-3 ms-4">
+					<div class="col-4">
+						<select required onchange="" name="organo" id="organo" class="form-control">
+							<option
+								th:each="ldvMaestra : ${@componentesComunesService.getListaComboLdvOrganoDto()}"
+								th:selected="${ldvMaestra.codLdvMae=='ORG-JUS'}"
+								th:text="${ldvMaestra.nomLdvMae + ' - ' + ldvMaestra.desLdvMae}"
+								th:value="${ldvMaestra.idLdvMae}" />
+						</select> 
+						<label required>Órgano:</label>
+					</div>
+					
+					<div class="col-4">
+						<select required name="idOrigen" onchange="" id="idOrigen"
+							class="form-control">
+							<option
+								th:each="ldvMaestra : ${@componentesComunesService.getListaComboLdvOrigenDto()}"
+								th:selected="${ldvMaestra.codLdvMae=='DOC-CIU'}"
+								th:text="${ldvMaestra.nomLdvMae}"
+								th:value="${ldvMaestra.idLdvMae}" />
+						</select> 
+						<label required>Origen:</label>
+					</div>
+					
+					<div class="col-4" th:if="${__${formularioPadre}__ != solicitud}">
+						<input th:if="${__${formularioPadre}__ != solicitud}"
+							class="form-control" id="numeroRegistro" name="numeroRegistro"
+							type="text" minlength="20" maxlength="20" placeholder/> 
+						<label>Número de registro:</label>
+					</div>
+				</div>
+				</div>
+				<div class="d-flex flex-column gap-4 ms-4">
+					<div class="d-flex gap-3">
+					<div class="col-12" th:if="${__${formularioPadre}__ != solicitud}">
+						<input th:if="${__${formularioPadre}__ != solicitud}"
+						class="form-control" id="fechaRegistro" name="fechaRegistro"
+						type="date" 
+						th:attr="min='1000-01-01', max=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"/> 
+						<label required>Fecha de presentación:</label>
+					</div>		
+					</div>
+				</div>
+				
+				<div class="adjuntar-content" id="recuadroAdjuntar0">
+					<h6>Documento</h6>
+					<div class="d-flex flex-column gap-4">
+						<div class="d-flex gap-3">
+							<div class="col-4" th:if="${documentoAdjuntar == null}" id="divIdDocTipo">
+								<select required name="adjunto[0].idDocTipo" class="form-control" onchange="manejarDocumentosDuplicados(event)"
+									 id="idDocTipo0">
+									<option value="0">Seleccionar...</option>
+									<option
+										th:each="documentoTipo : ${entrada == 'entrada' ? @componentesComunesService.getListaDocumentoTipoDtoSinEntrada(procedimiento) : @componentesComunesService.getListaDocumentoTipoDto(procedimiento)}"
+										th:text="${documentoTipo.nomTipo}"
+										th:value="${documentoTipo.idDocTipo}" />
+								</select> 
+								<label required id="labelIdDocTipo">Tipo de documento:</label>
+							</div>
+							<div class="col-4" th:if="${documentoAdjuntar == null}" id="divIdDocTipoSele" style="display: none;">
+								<div>
+									<strong id="selectLabelIdDocTipo">Tipo de documento:</strong>
+								</div>
+								<div>
+									<span id="selectIdDocTipoText" text=""></span>
+								</div>
+								<input id="selectIdDocTipo" type="hidden" value="" name="adjunto[0].idDocTipo"></input>
+							</div>
+						
+							<div class="col-4">
+								<select required name="adjunto[0].idEstadoElaboracion"
+									class="form-control" id="idEstadoElaboracion0">
+									<option
+										th:each="ldvMaestra : ${@componentesComunesService.getListaComboLdvMaestraEstadosElaboracionDto()}"
+										th:selected="${ldvMaestra.codLdvMae=='EE03'}"
+										th:text="${ldvMaestra.nomLdvMae}"
+										th:value="${ldvMaestra.idLdvMae}" />
+								</select> 
+								<label required>Estado de elaboración:</label>
+							</div>
+						</div>
+					</div>
+					<!--TODO: ELEMENTO FILE-->
+					<div class="col-sm-8">
+						<div class="file-content">
+              <label for="adjunto0" id="adjuntLabel">   
+              <span for="adjunto0">Documento</span>
+                        <input class="form-control" type="file" id="adjunto0" name="adjunto[0].docAdjunto" style="display: none;" accept=".pdf"
+                onchange="validaDocumentoAdjuntar(this)"/>
+                        <img th:src="@{/static/images/attach_file.svg}" id="clipAdjuntar" alt="Adjuntar documento" style="margin-left: 10px;">
+              </label>
+	                    <div id="file-tag-container" class="file-tag-container mt-2" style="display: none;">
+	                   		<span class="file-name" id="file-name"></span>
+	                        <img id="docAdjuntado"  th:src="@{/static/images/icon.svg}" alt="Eliminar documento" style="cursor: pointer;"
+	                        	onclick="reseteaDocumentoAdjuntar(this)">
+	                   	</div>
+						</div> 
+	           		</div>
+				</div>
+				<template id="recuadroAdjuntarTemplate">
+					<div class="adjuntar-content" id="recuadroAdjuntarTemplate">
+						<div class="document-content">
+							<div>
+								<h6>Documento</h6>
+								<img id="eliminarDiv" onclick="ocultarDiv(this)" src="/sinac-core/static/images/icon.svg" alt="Cierre de datos">
+							</div>
+						</div>
+						<div class="d-flex flex-column gap-4">
+							<div class="d-flex gap-3">
+						        <div class="col-4">
+						            <select required name="adjunto[__INDEX__].idDocTipo" id="idDocTipo__INDEX__" class="form-control" >
+						                <option value="0">Seleccionar...</option>
+						                <option th:each="documentoTipo :  ${entrada == 'entrada' ? @componentesComunesService.getListaDocumentoTipoDtoSinEntrada(procedimiento) : @componentesComunesService.getListaDocumentoTipoDto(procedimiento)}"
+						                    th:text="${documentoTipo.nomTipo}"
+						                    th:value="${documentoTipo.idDocTipo}"></option>
+						            </select>
+						            <label>Tipo de documento:</label>
+						            <span class="requerido" style="display: none;"></span>
+						        </div>
+						        <div class="col-4">
+						            <select required name="adjunto[__INDEX__].idEstadoElaboracion" 	id="idEstadoElaboracion__INDEX__" class="form-control" >
+						                <option th:each="ldvMaestra : ${@componentesComunesService.getListaComboLdvMaestraEstadosElaboracionDto()}"
+						                    th:selected="${ldvMaestra.codLdvMae=='EE03'}"
+						                    th:text="${ldvMaestra.nomLdvMae}"
+						                    th:value="${ldvMaestra.idLdvMae}"></option>
+						            </select>
+						            <label>Estado de elaboración:</label>
+						        </div>
+							</div>
+					    </div>
+					    <!--TODO: ELEMENTO FILE-->
+					    <div class="col-sm-8">
+					        <div class="file-content">
+								<label for="adjunto__INDEX__" id="adjuntLabel">
+								<span for="adjunto0">Documento</span>
+					            <input type="file" id="adjunto__INDEX__" name="adjunto[__INDEX__].docAdjunto" style="display: none;" accept=".pdf" required
+					                onchange="validaDocumentoAdjuntar(this)" />
+					            <img th:src="@{/static/images/attach_file.svg}" id="clipAdjuntar" alt="Adjuntar documento" style="margin-left: 10px;">
+					            </label>
+					       
+					        <div id="file-tag-container" class="file-tag-container mt-2" style="display: none;">
+					            <span class="file-name" id="file-name"></span>
+					            <img id="docAdjuntado" th:src="@{/static/images/icon.svg}" alt="Eliminar documento" style="cursor: pointer;"
+					                onclick="reseteaDocumentoAdjuntar(this)">
+					        </div>
+							</div>
+					    </div>
+					</div>
+				</template>
+			</form>	
+			<div>
+				<button class="tertiary" id="btnAnadirOtroDocumento"
+					name="btnAnadirOtroDocumento" value="Añadir documento" 
+					type="button"
+					onclick="agregarElementoDiv();">
+					<img th:src="@{/static/images/add-10-blue.svg}" alt="Añadir documento">
+				Añadir otro documento</button>
+			</div>
+			
+			<!--BUTTONS-->
+			<div>
+				<button class="tertiary" 
+					name="btnCancelarAdjuntarDocumento" value="Cancelar" 
+					type="button"
+					onclick="cerrarModal('AdjuntarDocumento');limpiarCamposModalAdjuntar();">
+				Cancelar</button>
+				<button class="primary"
+					th:if="${__${formularioPadre}__ == solicitud}"
+					id="btnAdjuntarDocumento"
+					name="btnAdjuntarDocumento" value="Adjuntar documento"
+					type="button" disabled
+					onclick="adjuntarDocumentoSol();">
+				Adjuntar</button>
+				<button class="primary"
+					th:if="${__${formularioPadre}__ != solicitud}"
+					id="btnAdjuntarDocumento"
+					th:data-parameter1="${__${formularioPadre}__.idExp}"
+					name="btnAdjuntarDocumento" value="Adjuntar documento"
+					type="button" disabled
+					onclick="adjuntarDocumentoExp(this.getAttribute('data-parameter1'))">
+				Adjuntar</button>
+			</div>
+		</div>
+	</th:block>
+	
+	<script>
+		let clipAdjuntar = document.getElementById("clipAdjuntar");
+		clipAdjuntar.addEventListener("onClick", function(){
+			document.getElementById("adjunto").click;
+		}, false)
+		
+		var input = document.getElementById("fechaRegistro");
+		var fechaActual = new Date().toISOString().split("T")[0];
+		input.setAttribute("max", fechaActual);
+	</script>
+</body>
+</html>
