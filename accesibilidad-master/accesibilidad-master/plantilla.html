@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<style type="text/css">
+<!--
+/* COMUNES */
+html {
+height: 100%;
+font-fammily:arial;
+padding: 2%;
+}
+body {
+height: 100%;
+}
+h1{
+text-align:center;
+color: #e1e5e9;
+}
+h4{
+background-color:#C2D2E7;
+color: white;
+font: 150% sans-serif;
+justify-content: center;
+align-items: center;
+text-align: center;
+}
+/* ENCABEZADO */
+.divContenedorEncabezado{
+width:100%;
+height:10%;
+text-align: center;
+}
+.divEncabezadoIzquierda{
+float:left;
+width:20%;
+height:100%;
+overflow: hidden;
+}
+.divEncabezadoCentro{
+float:left;
+width:60%;
+height:100%;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+.divEncabezadoDerecha{
+float:right;
+width:20%;
+height:100%;
+overflow: hidden;
+}
+.divEncabezadoIzquierda img{
+width: 100%;
+height: auto;
+}
+.divEncabezadoDerecha img{
+width: 100%;
+height: auto;
+}
+@supports(object-fit: cover){
+.divEncabezadoIzquierda img{
+height: 100%;
+object-fit: cover;
+object-position: center center;
+}
+.divEncabezadoDerecha img{
+height: 100%;
+object-fit: cover;
+object-position: center center;
+}
+}
+/* FIN ENCABEZADO */
+/* BODY */
+/* DIV */
+.divContenedorBody{
+width:100%;
+height:78%;
+}
+.divContendor{
+width:100%;
+display:flex;
+justify-content: center;
+align-items: center;
+margin-top: 1%;
+}
+.divContenedorIzquierda{
+margin-left: 15%;
+width:45%;
+display: inline-block;
+}
+.divContenedorDerecha{
+margin-right: 15%;
+width:20%;
+margin-left: 5%;
+}
+.divContendorFiltro{
+width:100%;
+display:flex;
+justify-content: center;
+align-items: center;
+margin-top: 1%;
+}
+.divContendorTabla{
+width:90%;
+margin-left: 5%;
+justify-content: center;
+align-items: center;
+text-align: center;
+margin-top: 2%;
+}
+.divContendorTablaPrincipal{
+width:90%;
+height:50%;
+margin-left: 5%;
+justify-content: center;
+align-items: center;
+text-align: center;
+margin-top: 2%;
+overflow-x: auto;
+overflow-y: auto;
+}
+.divContenedorDerechaImagen{
+margin-right: 15%;
+width:20%;
+margin-left: 5%;
+height: 180px;
+overflow: hidden;
+}
+/* FIN DIV */
+/* TABLA */
+.tablaResumen{
+border-collapse:collapse;
+width:100%;
+border-style: groove;
+border-color: #a2c7ec;
+}
+.tabla{
+background-color:#92a8d1;
+width:100%;
+border-collapse:collapse;
+}
+.tablaPrincipal{
+background-color:#92a8d1;
+width:100%;
+border-collapse:collapse;
+}
+th, td {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+thead{
+top: 0;
+background-color:#1A5276;
+border-bottom: solid 5px #0F362D;
+color: white;
+position: sticky;
+}
+tr.trTitulo{
+background-color:#C2D2E7;
+color: white;
+font: 150% sans-serif;
+justify-content: center;
+align-items: center;
+text-align: center;
+}
+table.tablaPrincipal tr:nth-child(even){
+background-color: #ddd;
+}
+table.tablaPrincipal tr:hover td{
+background-color:#C2D2E7;
+color: white;
+}
+/* FIN TABLA */
+/* FIN BODY */
+/* FOOTER */
+.divContenedorFooter{
+width:100%;
+padding:1%;
+text-align: center;
+}
+.divContenedorAlineado
+{
+display: inline-block;
+}
+/* FIN FOOTER */
+
+
+</style>
+<script>
+
+const titulo='@nombreProyecto@';
+const version='@version@';
+const fecha='@fecha@';
+const numeroPaginasAnalizadas='@numeroPaginasAnalizadas@';
+const totalElementos='@totalElementos@';
+const totalInfringidas='@totalInfringidas@';
+const totalIncompletas='@totalIncompletas@';
+const totalPasadas='@totalPasadas@';
+const paginas="@paginas@";
+const principios="@principios@";
+const nodos="@nodos@";
+const divisionElementos="@divisionElementos@";
+const divisionCampos="@divisionCampos@";
+const volverPaginaPrincipal="<div class='divContenedorMenor'>"+
+"<div class='divEncabezadoIzquierdaCincuenta'></div>"+
+"<div class='divEncabezadoDerechaCincuenta 'align='right'>"+
+"<button  type='button' data-my-id=0 class='btn btn-secondary btn-sm' onclick=paginaPrincipal();>Inicio</button>"+
+"</div>"+
+"</div>"+
+"";
+
+function paginaPrincipal(){
+
+	var listadoResumen=""+
+	"<div class='divContendor'>"+
+		"<div class='divContenedorIzquierda'>"+
+			"<table class='tablaResumen'>"+
+			"<tr class='trTitulo'>"+
+			"<th colspan=2>Resumen Ejecutivo</th>"+
+			"</tr>"+
+			"<tr >"+
+		    "<th >Aplicacion:</th>"+
+		    "<td>"+titulo+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Version:</th>"+
+		    "<td >"+version+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th>Fecha:</th>"+
+		    "<td >"+fecha+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Paginas analizadas:</th>"+
+		    "<td >"+numeroPaginasAnalizadas+"</td>"+
+		    "</tr>"+
+		    "</table>"+
+		"</div>"+
+		"<div class='divContenedorDerecha'>"+
+			//"<img src='ImagenMinisterio.png' alt='ImagenMinisterio.png'>"+
+		"</div>"+
+	"</div>";
+
+	var tablaResumen="<div class='divContendorTabla'>"+
+	"<h4>Elementos Analizados</h4>"+
+	"<table class='tabla' >"+
+		"<thead>"+
+			"<tr>"+
+				"<th>Total</th>"+
+				"<th>Infringidos</th>"+
+				"<th>Incompletos</th>"+
+				"<th>Pasados</th>"+
+			"</tr>"+
+		"</thead>"+
+		"<td>"+totalElementos+"<br></td>"+
+		"<td>"+totalInfringidas+"<br> </td>"+
+		"<td>"+totalIncompletas+"<br> </td>"+
+		"<td>"+totalPasadas+"<br> </td>"+
+	"</table>"+
+	"</div>";
+
+var tablaPrincipal="<div class='divContendorTablaPrincipal'>"+
+"<h4>Paginas Analizadas</h4>"+
+"<table class='tablaPrincipal'><thead class='theadPaginasAnalizadas'>"+
+    "<tr class='trPaginasAnalizadas'>"+
+        "<th class='thPaginasAnalizadas'>PAGINA</th>"+
+        "<th class='thPaginasAnalizadas'>URL</th>"+
+        "<th class='thPaginasAnalizadas'>Total Elementos</th>"+
+        "<th class='thPaginasAnalizadas'>Infringidos</th>"+
+        "<th class='thPaginasAnalizadas'>Incompletos</th>"+
+        "<th class='thPaginasAnalizadas'>Pasados</th>"+
+        "<th class='thPaginasAnalizadas'></th>"+
+    "</tr>"+
+"</thead>";
+//separo las paginas
+var pag=paginas.split(divisionElementos);
+for (let i = 0; i < pag.length; i++) {
+    //separo los campos
+    var campos=pag[i].split(divisionCampos);
+    tablaPrincipal+="<tr class='trPaginasAnalizadas'>"+
+    "	<td class='tdPaginasAnalizadas'>"+campos[1]+"</td>"+
+    "	<td class='tdPaginasAnalizadas'>"+campos[6]+"</td>"+
+    "	<td class='tdPaginasAnalizadas'>"+campos[2]+"</td>"+
+    "	<td class='tdPaginasAnalizadas'>"+campos[3]+"</td>"+
+    "	<td class='tdPaginasAnalizadas'>"+campos[4]+"</td>"+
+    "	<td class='tdPaginasAnalizadas'>"+campos[5]+"</td>"+
+    "<td class='tdPaginasAnalizadas'><input type='image' src='"+campos[1]+".png' alt='"+campos[1]+".png' width='50' height='50' onclick=cargarPagina("+campos[0]+");></td>"+
+    "</tr>";
+}
+tablaPrincipal+="</table></div>"
+document.getElementById("body").innerHTML =listadoResumen+tablaResumen+tablaPrincipal;
+}
+
+function mostrarImagen(tituloPagina){
+	alert("<img src='"+tituloPagina+".png' alt='"+tituloPagina+".png'/>")
+}
+
+function cargarPagina(idPagina){
+	var tituloPagina="";
+	var urlPagina="";
+	var totalElementosAnalizadosPagina="";
+	var totalElementosInfringidasPagina="";
+	var totalElementosIncompletasPagina="";
+	var totalElementosPasadasPagina="";
+	//cargamos los datos de la pagina
+	var pag=paginas.split(divisionElementos);
+for (let i = 0; i < pag.length; i++) {
+	//separo los campos
+    var campos=pag[i].split(divisionCampos);
+	if(campos[0]==idPagina){
+		tituloPagina=campos[1];
+		totalElementosAnalizadosPagina=campos[2];
+		totalElementosInfringidasPagina=campos[3];
+		totalElementosIncompletasPagina=campos[4];
+		totalElementosPasadasPagina=campos[5];
+		urlPagina=campos[6];
+	}
+}
+
+
+	var listadoResumen=""+
+	"<div class='divContendor'>"+
+		"<div class='divContenedorIzquierda'>"+
+			"<table class='tablaResumen'>"+
+			"<tr class='trTitulo'>"+
+			"<th colspan=2>Resumen pagina: "+tituloPagina+"</th>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Total elementos analizados:</th>"+
+		    "<td >"+totalElementosAnalizadosPagina+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Infringidos:</th>"+
+		    "<td>"+totalElementosInfringidasPagina+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Incompletos:</th>"+
+		    "<td >"+totalElementosIncompletasPagina+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Pasados:</th>"+
+		    "<td >"+totalElementosPasadasPagina+"</td>"+
+		    "</tr>"+
+		    "</table>"+
+	    "</div>"+
+	    "<div class='divContenedorDerechaImagen'>"+
+	    	"<img src='"+tituloPagina+".png' alt='"+tituloPagina+".png' width='200' height='200'>"+
+	    "</div>"+
+    "</div>";
+
+
+	var tablaFiltro="<div class='divContendorFiltro'>"+
+	"<div class='divContenedorIzquierda'>"+
+	"<div class='divFiltroAccesibilidad'>Filtrar Nivel Accesibilidad</div>"+
+	"<div class='divFiltroAccesibilidadBoton'>"+
+	"<select id='campoSelect' onchange='buscarTabla()'>"+
+	"<option value='Todos'>Todos</option>"+
+    "<option value='A'>A</option>"+
+    "<option value='AA'>AA</option>"+
+    "<option value='AAA'>AAA</option>"+
+    "<option value='Mejores practicas'>Mejores practicas</option>"+
+    "</select>"+
+	"</div>"+
+	"</div>"+
+	"<div class='divContenedorDerecha' align='right'>"+
+	"<div><button  type='button' data-my-id=0 class='btn btn-secondary btn-sm' onclick=paginaPrincipal();>Inicio</button></div>"+
+	"</div>"+
+	"</div>"+
+	"";
+
+	var tablaPrincipal="<div  class='divContendorTablaPrincipal' id='cargarPaginaTablaPrincipal'>"+
+	"<table class='tablaPrincipal'><thead>"+
+    "<tr>"+
+        "<th>Principio</th>"+
+        "<th>Pauta</th>"+
+        "<th>Nivel de Impacto</th>"+
+        "<th>ERROR Accesibilidad</th>"+
+        "<th>Nivel de Accesbilidad</th>"+
+        "<th>Nodos afectados</th>"+
+        "<th>Estado</th>"+
+        "<th></th></tr></thead>";
+//separo los principios
+var pagPrincipios=principios.split(divisionElementos);
+for (let i = 0; i < pagPrincipios.length; i++) {
+    //separo los campos
+    var camposPrincipios=pagPrincipios[i].split(divisionCampos);
+    //compruebo si son principios de la pagina
+    if(camposPrincipios[1]==idPagina){
+        tablaPrincipal+="<tr class='trPaginasAnalizadas'>"+
+        "<td class='tdPaginasAnalizadas'>"+camposPrincipios[3]+"</td>"+
+        "<td class='tdPaginasAnalizadas'>"+camposPrincipios[4]+"</td>"+
+        "<td class='tdPaginasAnalizadas'>"+camposPrincipios[5]+"</td>"+
+        "<td class='tdPaginasAnalizadas'>"+camposPrincipios[6]+"</td>"+
+        "<td class='tdPaginasAnalizadas'>"+camposPrincipios[7]+"</td>"+
+        "<td class='tdPaginasAnalizadas'>"+camposPrincipios[8]+"</td>"+
+        "<td class='tdPaginasAnalizadas'>"+camposPrincipios[2]+"</td>"+
+        "<td class='tdPaginasAnalizadas'><button  type='button'data-my-id=0 class='btn btn-secondary btn-sm'onclick=cargarDetallePrincipio("+camposPrincipios[1]+","+camposPrincipios[0]+")>Ver detalle</button></td>"+
+        "</tr>";
+    }
+}
+tablaPrincipal+="</table></div>"
+document.getElementById("body").innerHTML =listadoResumen+tablaFiltro+tablaPrincipal;
+}
+
+
+function buscarTabla() {
+	  // Declare variables
+	  var input, filter, table, tr, td, i, txtValue;
+	  input = document.getElementById('campoSelect');
+	  filter = input.value.toUpperCase();
+	  table = document.getElementById('cargarPaginaTablaPrincipal');
+	  tr = table.getElementsByTagName('tr');
+
+	  // Loop through all table rows, and hide those who don't match the search query
+	  for (i = 0; i < tr.length; i++) {
+		 td = tr[i].getElementsByTagName('td')[4];
+		    if (td) {
+		    	if(filter=="TODOS"){
+					tr[i].style.display = '';
+				}
+		    	else{
+		    	txtValue = td.textContent || td.innerText;
+		  		if (txtValue.toUpperCase()==filter) {
+		  			tr[i].style.display = '';
+		  		}
+		  		else {
+		  		   	tr[i].style.display = 'none';
+		  		    }
+		    	}
+		    }
+	  }
+	}
+
+
+
+
+
+function cargarDetallePrincipio(idPagina,idPrincipio){
+
+	var tituloPagina="";
+	//cargamos los datos de la pagina
+	var pag=paginas.split(divisionElementos);
+for (let i = 0; i < pag.length; i++) {
+	//separo los campos
+    var campos=pag[i].split(divisionCampos);
+	if(campos[0]==idPagina){
+		tituloPagina=campos[1];
+	}
+}
+
+var situacion="";
+var principio="";
+var pauta="";
+var nivelImpacto="";
+var errorAccesibilidad="";
+var nivelAccesibilidad="";
+var descripcion="";
+var helpUrl="";
+var help="";
+var pagPrincipios=principios.split(divisionElementos);
+for (let i = 0; i < pagPrincipios.length; i++) {
+	//separo los campos
+    var campos=pagPrincipios[i].split(divisionCampos);
+
+	if(campos[0]==idPrincipio){
+		situacion=campos[2];
+		principio=campos[3];
+		pauta=campos[4];
+		nivelImpacto=campos[5];
+		errorAccesibilidad=campos[6];
+		nivelAccesibilidad=campos[7];
+		descripcion=campos[9];
+		helpUrl=campos[10];
+		help=campos[11];
+
+
+		i=pagPrincipios.length;
+
+	}
+}
+
+	var listadoResumenPauta=""+
+	"<div id='divContendor' class='divContendor'>"+
+		"<div class='divContenedorIzquierda'>"+
+			"<table class='tablaResumen' >"+
+			"<tr class='trTitulo'>"+
+			"<th colspan=2>Principio:"+principio+"</th>"+
+			"</tr>"+
+			"<tr >"+
+			"<th ></th>"+
+			"<tr >"+
+			"<th ></th>"+
+		    "<tr>"+
+		    "<th >Pauta:</th>"+
+		    "<td >"+pauta+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Estado:</th>"+
+		    "<td >"+situacion+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Nivel Impacto:</th>"+
+		    "<td >"+nivelImpacto+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Error Accesibilidad:</th>"+
+		    "<td >"+errorAccesibilidad+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Nivel Accesibilidad:</th>"+
+		    "<td >"+nivelAccesibilidad+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th>Descripcion:</th>"+
+		    "<td >"+descripcion+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th >Help:</th>"+
+		    "<td>"+help+"</td>"+
+		    "</tr>"+
+		    "<tr >"+
+		    "<th colspan=2><a href='"+helpUrl+"'>"+helpUrl+"</a></th>"+
+		    "</tr>"+
+		    "</table>"+
+	    "</div>"+
+	    "<div class='divContenedorDerechaImagen'>"+
+	    "<img src='"+tituloPagina+".png' alt='"+tituloPagina+".png' width='200' height='200'>"+
+	    "</div>"+
+    "</div>";
+
+
+	var tablaPrincipal="<div  class='divContendorTablaPrincipal'><table class='tablaPrincipal'><thead>"+
+    "<tr class='trPaginasAnalizadas'>"+
+     "   <th class='thPaginasAnalizadas'>target</th>"+
+        "<th class='thPaginasAnalizadas'>failureSummary</th>"+
+        "</tr></thead><tbody>";
+//separo los nodos
+var listNodos=nodos.split(divisionElementos);
+
+for (let i = 0; i < listNodos.length; i++) {
+    //separo los campos
+    var camposNodos=listNodos[i].split(divisionCampos);
+    //compruebo si son nodos del principio
+    if(camposNodos[1]==idPrincipio){
+        tablaPrincipal+="<tr class='trPaginasAnalizadas'>"+
+        "<td class='tdPaginasAnalizadas'>"+camposNodos[2]+"</td>"+
+        "<td class='tdPaginasAnalizadas'>"+camposNodos[3]+"</td>"+
+        "</tr>";
+    }
+}
+tablaPrincipal+="</tbody></table></div>"
+
+var volverPagina="<div class='divContendorFiltro'>"+
+"<div class='divContenedorIzquierda'>"+
+"<div><button  type='button' data-my-id=0 class='btn btn-secondary btn-sm' onclick=cargarPagina("+idPagina+");>Volver Pagina</button></div>"+
+"</div>"+
+"<div class='divContenedorDerecha' align='right'>"+
+"<div><button  type='button' data-my-id=0 class='btn btn-secondary btn-sm' onclick=paginaPrincipal();>Inicio</button></div>"+
+"</div>"+
+"</div>"+
+"";
+
+document.getElementById("body").innerHTML =listadoResumenPauta+volverPagina+tablaPrincipal;
+}
+
+
+</script>
+<head>    
+<meta charset="UTF-8">    
+<meta http-equiv="X-UA-Compatible" content="IE=edge">    
+<meta name="viewport" content="width=device-width, initial-scale=1.0">    
+<title id="titulo">Informe actividad de Certape</title>    
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">    
+<link href="style/style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="divEncabezado" class=divContenedorEncabezado>
+<div id="divEncabezadoImagen" class='divEncabezadoIzquierda'>
+<img src='@imagenPrincipal@' alt='@imagenPrincipal@' height='100'>
+</div><div  id="divEncabezadoTitulo"class='divEncabezadoCentro'>
+<h1>Informe actividad de @nombreProyecto@</h1>
+</div>
+<div class='divEncabezadoDerecha'>
+</div>
+</div>
+<div id="body" class=divContenedorBody>
+<script>paginaPrincipal();</script>
+</div>
+</body>
+</html>
