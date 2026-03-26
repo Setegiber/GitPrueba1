@@ -1,0 +1,34 @@
+Informe de auditoría del framework de evaluación de accesibilidad
+
+1 - Introducción
+Este documento tiene la finalidad de plasmar el estado actual del framework que evalúa la accesibilidad de páginas web de forma automática, puntos que se deberían corregir y posibles mejoras que pueden implementarse.
+2 – Evaluación arquitectónica
+La interfaz de usuario, la navegación, el análisis, la lectura de resultados y la generación del informe están muy acoplados entre si.
+Actualmente el sistema gira alrededor de la aplicación de escritorio. Si la intención es crear un framework de accesibilidad ampliable y que perdure debería desacoplarse el núcleo evaluador y que la UI funcione como un cliente a parte, eso permitiría poder usar el núcleo a través de linea de comandos o una API y no solo a través de la aplicación de escritorio.
+Otra consecuencia del acoplamiento es que la evolución del framework será mas lenta, costosa y aumentará cada vez mas el riesgo de regresiones.
+Para que el framework pueda crecer adecuadamente es necesaria una reorganización de código. La capa de la interfaz tiene demasiada lógica, todas las clases se encuentran en un único paquete, no hay separación de módulos, el manejo de errores es básico y no hay test automáticos. Todo lo anterior puede dificultar el crecimiento y reducir la calidad del framework.
+3 – Evaluación del motor de accesibilidad
+Actualmente, el framework depende casi exclusivamente de la cobertura de Axe, considero que sería beneficioso añadir un motor de reglas propio por encima que permita la adición de nuevas reglas y validaciones que contemplen los casos en los que Axe podría quedarse corto. Esto también ayudaría a poder acercarse al estándar WCAG.
+Respecto al reporting, hay algunos problemas, como que un falso positivo influya en el total o que las recomendaciones del informe sean algo genéricas, esto podría reducir la credibilidad del informe o sensación de exceso de incidencias.
+
+4 – Correcciones de arquitectura prioritarias
+1. Separar la interfaz del motor.
+El framework depende demasiado de la aplicación de escritorio, lo que dificulta automatizar, escalar y reutilizar el sistema. Seria recomendable crear un núcleo de evaluación independiente de Swing para que la UI sea solamente un cliente mas del motor.
+Esto pasa también por desacoplar todo lo demás, captura, análisis, revisión y reporting.
+2. Crear un modelo central de ejecución.
+Actualmente solamente se analizan páginas sueltas a las que se llega por intervención manual, esto provoca falta de trazabilidad y repetibilidad.
+Si se pudieran definir entidades como Proyecto, Ejecución, Página, Estado, Hallazgo o Revisión, sería posible escalar y automatizar mucho mas el sistema. 
+3. Identificar los hallazgos de forma estable.
+Las revisiones manuales dependen del índice de la fila, no de la identidad real del hallazgo, lo que provoca que una incidencia pueda quedar mal asociada si cambia el orden de resultado. Esto podría arreglarse creando un identificador único por cada hallazgo.
+4. Incorporar un motor de reglas ampliable.
+El framework depende casi en exclusiva de axe-core. Esto limita la cobertura futura. Se podría construir una capa propia de reglas por encima de axe que implemente un registro de reglas, metadatos WCAG, severidad, evidencia esperada, explicaciones y recomendaciones. 
+5. Añadir soporte real de SPAs.
+Es posible analizar SPAs pero no recorrerlos de forma automática, esto provoca que se escapen casos reales de accesibilidad. Podría solucionarse definiendo escenarios automáticos de navegación e interacción en los que se implementen secuencias de acciones, tabulación, apertura de menús, espera de contenido o validación de foco.
+6. Añadir simulación de interacción.
+Siguiendo con el punto anterior, gran parte de la accesibilidad depende del uso con teclado y el foco visible lo que provoca que pueda haber falsos negativos en componentes interactivos. Esto podría solucionarse ampliando el motor con análisis por estado con chequeos antes y después del focus, enter, escape o hover.
+7. Mejorar el modelo de resultados.
+Es posible mejorar el informe final enriqueciendo cada hallazgo con mas contexto como por ejemplo, añadir criterios WCAG, impacto, captura del elemento o recomendaciones especificas. 
+8. Crear más salidas a parte del PDF.
+Tener mas salidas a parte del PDF puede ser productivo en cuanto a la integración con otros sistemas e incluir mas información útil. Esto se podría conseguir añadiendo salida de Excel o JSON.
+9. Reforzar calidad y pruebas.
+Debido a la inexistencia de test, el framework puede evolucionar de forma mas lenta y arriesgada. Seria muy conveniente crear test para el motor, el reporting y demás partes del framework.
