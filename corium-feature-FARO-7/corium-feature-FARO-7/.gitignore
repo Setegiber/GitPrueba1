@@ -1,0 +1,24 @@
+.classpath
+.project
+.settings/
+target/
+.flattened-pom.xml
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+otu/
+
+### Eclipse ###
+.project
+.classpath
+.factorypath
+.settings/
+bin/
+*.launch
+
+### VS Code ###
+.vscode/
+
