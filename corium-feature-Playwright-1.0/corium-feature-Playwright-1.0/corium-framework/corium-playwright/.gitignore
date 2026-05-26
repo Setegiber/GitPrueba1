@@ -1,0 +1,10 @@
+dependency-reduced-pom.xml
+/.idea/*
+/drivers/tmp/
+/target/
+*.iml
+/test-output/
+/out/
+/web/
+/logs/
+/javadoc/

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="HOME_LOG" value="test-output/logs/tests.log" />
+
+    <appender name="FILE-ROLLING" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${HOME_LOG}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>test-output/logs/testold.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>1GB</maxFileSize>
+            <totalSizeCap>1GB</totalSizeCap>
+            <maxHistory>2</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SIFTER" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <discriminator>
+            <key>testName</key>
+            <defaultValue>ALL</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${testName}" class="ch.qos.logback.core.rolling.RollingFileAppender">
+                <file>test-output/logs/${testName}.log</file>
+                <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                    <fileNamePattern>test-output/logs/testold.${testName}.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                    <maxFileSize>1GB</maxFileSize>
+                    <totalSizeCap>1GB</totalSizeCap>
+                    <maxHistory>2</maxHistory>
+                </rollingPolicy>
+                <encoder>
+                    <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+                </encoder>
+            </appender>
+        </sift>
+    </appender>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+        <encoder>
+            <pattern>%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="playwright.logger" level="info" additivity="false">
+        <appender-ref ref="SIFTER"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="FILE-ROLLING" />
+        <appender-ref ref="SIFTER"/>
+    </root>
+
+</configuration>
