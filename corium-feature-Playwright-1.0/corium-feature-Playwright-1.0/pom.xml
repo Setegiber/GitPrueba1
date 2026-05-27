@@ -34,6 +34,11 @@
     <io.github.bonigarcia.version>6.3.3</io.github.bonigarcia.version>
     <org.testng.version>7.11.0</org.testng.version>
     <com.squareup.okhttp3.version>4.9.1</com.squareup.okhttp3.version>
+    <org.junit.jupiter.version>5.11.1</org.junit.jupiter.version>
+    <org.junit.platform.version>1.11.1</org.junit.platform.version>
+    <com.microsoft.playwright.version>1.59.0</com.microsoft.playwright.version>
+    <com.deque.html.axe.core.playwright.version>4.10.1</com.deque.html.axe.core.playwright.version>
+    <com.fasterxml.jackson.databind.version>2.18.2</com.fasterxml.jackson.databind.version>
     <ch.qos.logback.version>1.5.16</ch.qos.logback.version>
     <!-- Versiones de plugins -->
     <maven.clean.plugin.version>3.5.0</maven.clean.plugin.version>

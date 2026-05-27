@@ -13,6 +13,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>corium-selenium-dependencies</module>
+    <module>corium-playwright-dependencies</module>
   </modules>
   <dependencyManagement>
     <dependencies>

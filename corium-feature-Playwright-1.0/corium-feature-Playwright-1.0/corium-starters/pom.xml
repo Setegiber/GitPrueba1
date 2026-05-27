@@ -13,5 +13,6 @@
   <packaging>pom</packaging>
   <modules>
     <module>corium-selenium-starter</module>
+    <module>corium-playwright-starter</module>
   </modules>
 </project>

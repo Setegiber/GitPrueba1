@@ -14,5 +14,6 @@
   <modules>
     <module>corium-core-bom</module>
     <module>corium-selenium-bom</module>
+    <module>corium-playwright-bom</module>
   </modules>
 </project>

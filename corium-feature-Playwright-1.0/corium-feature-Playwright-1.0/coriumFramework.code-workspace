@@ -4,7 +4,7 @@
             "path": "."
         },
         {
-            "path": "corium-frameworks/corium-playwright"
+            "path": "corium-framework/corium-playwright"
         }
     ]
 }
